@@ -1,0 +1,9 @@
+CompileFlags:
+  Add: [-Wall, -Wpedantic, -Wextra, -Wunreachable-code]
+  Compiler: clang
+Diagnostics:
+  UnusedIncludes: Strict
+  ClangTidy:
+    Add: modernize*
+    CheckOptions:
+          readability-identifier-naming.VariableCase: lower_case
