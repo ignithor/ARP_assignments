@@ -1,0 +1,19 @@
+{
+    "drone": {
+        "mass": 1.0,
+        "time_step": 0.01,
+        "viscous_coefficient": 1.0,
+        "init_pos_x": 20.0,
+        "init_pos_y": 20.0,
+        "reading_params_interval": 10,
+        "area_of_effect": 20.0,
+        "targ_of_effect": 30.0,
+        "obst_of_effect": 20.0,
+        "function_scale": 10.0
+    },
+    "input": {
+        "max_force": 50.0,
+        "force_step": 5.0,
+        "reading_params_interval": 10
+    }
+}
