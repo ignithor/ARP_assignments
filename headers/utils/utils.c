@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "utils/utils.h"
 
 // Function to get the parameters from the JSON file
 float get_param(const char *process, const char *param) {
@@ -8,12 +8,13 @@ float get_param(const char *process, const char *param) {
 
     // Open the config file
     // The relative path is used and the executable is in the bin folder
-    config_file = fopen("../config/parameters.json", "r");
+    config_file = fopen("../config/drone_parameters.json", "r");
     if (config_file == NULL) {
-        perror("Error opening the config file /config/parameters.json");
+        perror("Error opening the config file /config/drone_parameters.json");
         char logmsg[300];
-        sprintf(logmsg,
-                "Error opening the config file /config/parameters.json\n ");
+        sprintf(
+            logmsg,
+            "Error opening the config file /config/drone_parameters.json\n ");
         logging(LOG_ERROR, logmsg);
         return EXIT_FAILURE; // 1
     }
@@ -26,8 +27,9 @@ float get_param(const char *process, const char *param) {
     if (json == NULL) {
         perror("Error parsing JSON file\n");
         char logmsg[300];
-        sprintf(logmsg,
-                "Error parsing the config file /config/parameters.json\n ");
+        sprintf(
+            logmsg,
+            "Error parsing the config file /config/drone_parameters.json\n ");
         logging(LOG_ERROR, logmsg);
         return EXIT_FAILURE;
     }

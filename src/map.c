@@ -1,8 +1,8 @@
 #include "constants.h"
 #include "dataStructs.h"
 #include "ncurses.h"
-#include "utils.h"
-#include "wrapFunc.h"
+#include "utils/utils.h"
+#include "wrapFuncs/wrapFunc.h"
 #include <curses.h>
 #include <fcntl.h>
 #include <math.h>
@@ -19,7 +19,8 @@
 #include <time.h>
 #include <unistd.h>
 
-int previous_score = 0;
+// WD pid
+pid_t WD_pid;
 
 // This array keeps the position of all the targets and obstacles in order to
 // perform collision checking
@@ -291,19 +292,10 @@ int main(int argc, char *argv[]) {
 
         // Display the menu text
         refresh();
-        // Displaying the score in different colors if it has changed or not
+        // Displaying the title of the window.
         mvprintw(0, 0, "MAP DISPLAY");
-        if (score > 0) {
-            attron(COLOR_PAIR(3));
-            mvprintw(0, COLS / 3, "Score: %d", score);
-            attroff(COLOR_PAIR(3));
-        } else if (score < 0) {
-            attron(COLOR_PAIR(2));
-            mvprintw(0, COLS / 3, "Score: %d", score);
-            attroff(COLOR_PAIR(2));
-        } else
-            mvprintw(0, COLS / 3, "Score: %d", score);
-        refresh();
+
+        mvprintw(0, COLS / 3, "Score: %d", score);
 
         // Deleting the old window that is encapsulating the map in order to
         // create the animation, and to allow the resizing of the window in case

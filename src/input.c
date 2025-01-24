@@ -1,7 +1,7 @@
 #include "constants.h"
 #include "dataStructs.h"
-#include "utils.h"
-#include "wrapFunc.h"
+#include "utils/utils.h"
+#include "wrapFuncs/wrapFunc.h"
 #include <curses.h>
 #include <fcntl.h>
 #include <math.h>
@@ -16,6 +16,9 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+
+// WD pid
+pid_t WD_pid = -1;
 
 // Create the outer border of the window
 WINDOW *input_display_setup(int height, int width, int starty, int startx) {
@@ -265,7 +268,6 @@ int main(int argc, char *argv[]) {
     // background is set to -1 meaning that it becomes the current terminal
     // background color
     init_pair(1, COLOR_GREEN, -1);
-    init_pair(2, COLOR_RED, -1);
 
     // The windows of the matrix visible in the left split are now initialized
     WINDOW *left_split  = input_display_setup(LINES, COLS / 2 - 1, 0, 0);
@@ -332,6 +334,12 @@ int main(int argc, char *argv[]) {
         // If the user presses the p key then it's time for all the processes to
         // die in a safe way
         if (input == 'p') {
+            // This is not very elegant but the watchdog has to be killed in
+            // order to not trigger an emergency shutdown due to the lack of the
+            // already killed processes
+            if (WD_pid != -1)
+                Kill(WD_pid, SIGKILL);
+
             // Signal the server of the received STOP signal
             Write(to_server_pipe, "STOP", MAX_MSG_LEN);
             break;
@@ -471,23 +479,10 @@ int main(int argc, char *argv[]) {
         // user. So no border effects are taken into consideration while
         // displaying these values.
         mvwprintw(right_split, LINES / 10 + 12, COLS / 10, "force {");
-        if (fabs(drone_current_force.x_component) == max_force) {
-            wattron(right_split, COLOR_PAIR(2));
-            mvwprintw(right_split, LINES / 10 + 13, COLS / 10, "\tx: %f",
-                      drone_current_force.x_component);
-            wattroff(right_split, COLOR_PAIR(2));
-        } else
-            mvwprintw(right_split, LINES / 10 + 13, COLS / 10, "\tx: %f",
-                      drone_current_force.x_component);
-        if (fabs(drone_current_force.y_component) == max_force) {
-
-            wattron(right_split, COLOR_PAIR(2));
-            mvwprintw(right_split, LINES / 10 + 14, COLS / 10, "\ty: %f",
-                      drone_current_force.y_component);
-            wattroff(right_split, COLOR_PAIR(2));
-        } else
-            mvwprintw(right_split, LINES / 10 + 14, COLS / 10, "\ty: %f",
-                      drone_current_force.y_component);
+        mvwprintw(right_split, LINES / 10 + 13, COLS / 10, "\tx: %f",
+                  drone_current_force.x_component);
+        mvwprintw(right_split, LINES / 10 + 14, COLS / 10, "\ty: %f",
+                  drone_current_force.y_component);
         mvwprintw(right_split, LINES / 10 + 15, COLS / 10, "}");
 
         // Refreshing all the windows

@@ -1,7 +1,7 @@
 #include "constants.h"
 #include "dataStructs.h"
-#include "utils.h"
-#include "wrapFunc.h"
+#include "utils/utils.h"
+#include "wrapFuncs/wrapFunc.h"
 #include <curses.h>
 #include <fcntl.h>
 #include <math.h>
@@ -15,6 +15,9 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+
+// WD pid
+pid_t WD_pid;
 
 // This function returns the border effect given the general
 // function given in the docs folder of the project. All the parameters can be
@@ -118,7 +121,7 @@ int main(int argc, char *argv[]) {
     // the server
     char to_send[MAX_MSG_LEN];
 
-    // fd used for the select syscall
+    // max_fd used for the select syscall
     int fd = from_server_pipe;
 
     // Arrays used to store targets and obstacles in real world coordinates
@@ -145,7 +148,7 @@ int main(int argc, char *argv[]) {
             if (reading_params_interval < 1)
                 reading_params_interval = 1;
 
-            // Then all the other parameters are read
+            // Then all the other phisic parameters are read
             M              = get_param("drone", "mass");
             T              = get_param("drone", "time_step");
             K              = get_param("drone", "viscous_coefficient");

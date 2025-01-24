@@ -13,7 +13,7 @@
     },
     "input": {
         "max_force": 50.0,
-        "force_step": 5.0,
+        "force_step": 1.0,
         "reading_params_interval": 10
     }
 }

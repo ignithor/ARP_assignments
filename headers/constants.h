@@ -8,7 +8,7 @@
 #define SEM_PATH_FORCE "/sem_force"
 #define SEM_PATH_VELOCITY "/sem_velocity"
 
-#define LOGFILE_PATH "log/log.log"
+#define LOGFILE_PATH "../log/process.log"
 #define FIFO1_PATH "/tmp/fifo_one"
 #define FIFO2_PATH "/tmp/fifo_two"
 
@@ -29,7 +29,7 @@
 #define MAX_MSG_LEN 1024
 
 #define N_TARGETS 9
-#define N_OBSTACLES 10
+#define N_OBSTACLES 9
 #define MAX_NUMBER 500
 
 // Maximum combined force from the obstacles

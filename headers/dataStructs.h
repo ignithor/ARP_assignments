@@ -1,5 +1,4 @@
-#ifndef DATASTRUCTS_H
-#define DATASTRUCTS_H
+#pragma once
 
 struct force {
     float x_component;
@@ -15,5 +14,3 @@ struct velocity {
     float x_component;
     float y_component;
 };
-
-#endif

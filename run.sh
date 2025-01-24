@@ -7,7 +7,5 @@ cmake ..
 make
 # Going inside the folder with the executables
 cd ../bin
-# remove log file
-rm ./log/log.log
 # Running the project
 ./master

@@ -1,6 +1,6 @@
 #include "constants.h"
-#include "utils.h"
-#include "wrapFunc.h"
+#include "utils/utils.h"
+#include "wrapFuncs/wrapFunc.h"
 #include <fcntl.h>
 #include <signal.h>
 #include <stdbool.h>

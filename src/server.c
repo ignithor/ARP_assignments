@@ -1,7 +1,7 @@
 #include "constants.h"
 #include "dataStructs.h"
-#include "utils.h"
-#include "wrapFunc.h"
+#include "utils/utils.h"
+#include "wrapFuncs/wrapFunc.h"
 #include <fcntl.h>
 #include <signal.h>
 #include <stdbool.h>
@@ -13,6 +13,9 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+
+// WD pid
+pid_t WD_pid;
 
 int main(int argc, char *argv[]) {
     // Macro to handle the watchdog signals
@@ -104,9 +107,8 @@ int main(int argc, char *argv[]) {
                                  // force to the drone pipe
                             Write(to_drone_pipe, received, MAX_MSG_LEN);
                         }
-                    }
 
-                    else if (i == from_drone_pipe) {
+                    } else if (i == from_drone_pipe) {
                         // The drone process sends the update speed and position
                         // of the drone
                         sscanf(received, "%f,%f|%f,%f", &drone_current_pos.x,
@@ -141,7 +143,6 @@ int main(int argc, char *argv[]) {
                 }
             }
         }
-
         // If STOP sent then it needs to be closed
         if (to_exit)
             break;

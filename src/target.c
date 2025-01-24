@@ -1,6 +1,5 @@
 #include "constants.h"
-#include "utils.h"
-#include "wrapFunc.h"
+#include "wrapFuncs/wrapFunc.h"
 #include <curses.h>
 #include <fcntl.h>
 #include <signal.h>
@@ -13,6 +12,10 @@
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
+#include <utils/utils.h>
+
+// WD pid
+pid_t WD_pid;
 
 int main(int argc, char *argv[]) {
     // Macro to handle the watchdog signals

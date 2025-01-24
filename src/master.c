@@ -1,5 +1,5 @@
 #include "constants.h"
-#include "wrapFunc.h"
+#include "wrapFuncs/wrapFunc.h"
 #include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -26,8 +26,8 @@ int main(int argc, char *argv[]) {
     strcpy(programs[2], "./input");
     strcpy(programs[3], "./map");
     strcpy(programs[4], "./target");
-    strcpy(programs[5], "./obstacle");
-    strcpy(programs[6], "./watchdog");
+    strcpy(programs[5], "./obstacles");
+    strcpy(programs[6], "./WD");
 
     // Pids for all children
     pid_t child[NUM_PROCESSES];
