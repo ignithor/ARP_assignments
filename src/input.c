@@ -268,6 +268,7 @@ int main(int argc, char *argv[]) {
     // background is set to -1 meaning that it becomes the current terminal
     // background color
     init_pair(1, COLOR_GREEN, -1);
+    init_pair(2, COLOR_RED, -1);
 
     // The windows of the matrix visible in the left split are now initialized
     WINDOW *left_split  = input_display_setup(LINES, COLS / 2 - 1, 0, 0);
@@ -479,11 +480,22 @@ int main(int argc, char *argv[]) {
         // user. So no border effects are taken into consideration while
         // displaying these values.
         mvwprintw(right_split, LINES / 10 + 12, COLS / 10, "force {");
-        mvwprintw(right_split, LINES / 10 + 13, COLS / 10, "\tx: %f",
-                  drone_current_force.x_component);
-        mvwprintw(right_split, LINES / 10 + 14, COLS / 10, "\ty: %f",
-                  drone_current_force.y_component);
-        mvwprintw(right_split, LINES / 10 + 15, COLS / 10, "}");
+        if (fabs(drone_current_force.x_component) == max_force) {
+            wattron(right_split, COLOR_PAIR(2));
+            mvwprintw(right_split, LINES / 10 + 13, COLS / 10, "\tx: %f",
+                      drone_current_force.x_component);
+            wattroff(right_split, COLOR_PAIR(2));
+        } else
+            mvwprintw(right_split, LINES / 10 + 13, COLS / 10, "\tx: %f",
+                      drone_current_force.x_component);
+        if (fabs(drone_current_force.y_component) == max_force) {
+            wattron(right_split, COLOR_PAIR(2));
+            mvwprintw(right_split, LINES / 10 + 14, COLS / 10, "\ty: %f",
+                      drone_current_force.y_component);
+            wattroff(right_split, COLOR_PAIR(2));
+        } else
+            mvwprintw(right_split, LINES / 10 + 14, COLS / 10, "\ty: %f",
+                      drone_current_force.y_component);
 
         // Refreshing all the windows
         wrefresh(left_split);
