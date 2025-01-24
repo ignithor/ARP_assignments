@@ -1,6 +1,13 @@
+if [ -d "build" ]; then
+  rm -r build
+fi
+
+if [ -d "bin" ]; then
+  rm -r bin
+fi
+
+mkdir build
 cd build
-# Cleaning the previous compiled executables if present
-make clean
 # Generating make file
 cmake ..
 # Compiling
