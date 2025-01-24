@@ -9,8 +9,8 @@
 #define SEM_PATH_VELOCITY "/sem_velocity"
 
 #define LOGFILE_PATH "../log/process.log"
-#define FIFO1_PATH "/tmp/fifo_one"
-#define FIFO2_PATH "/tmp/fifo_two"
+#define FIFO1_PATH "./fifo_one"
+#define FIFO2_PATH "./fifo_two"
 
 #define MAX_SHM_SIZE 1024
 #define SHM_OFFSET_POSITION 0
