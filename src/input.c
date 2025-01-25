@@ -287,7 +287,7 @@ int main(int argc, char *argv[]) {
     // initialized here
     char input;
 
-    // The value of the reading params interval for the read from the paraeters
+    // The value of the reading params interval for the read from the parameters
     // file is first set here. This is a counter that is decreased for each
     // cycle in the main while loop. It is a way to reduce the number of reads
     // from the parameters file. The parameter is given in seconds. In order to

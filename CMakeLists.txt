@@ -6,5 +6,5 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 add_compile_options(-Wall -Wextra -Wpedantic)
 
-add_subdirectory(headers)
+add_subdirectory(include)
 add_subdirectory(src)
