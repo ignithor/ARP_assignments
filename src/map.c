@@ -369,14 +369,7 @@ int main(int argc, char *argv[]) {
                 }
             if (target_x == drone_x && target_y == drone_y) {
                 // time_t impact_time = time(NULL) - start_time;
-<<<<<<< HEAD
-                // time_t impact_time = current_time - start_time;
-                // printf("Impact time: %ld seconds\n", impact_time);
-                
-=======
                 time_t impact_time = current_time - start_time;
-                printf("Impact time: %ld seconds\n", impact_time);
->>>>>>> ae8841b (Add additional rules on calculation of the score)
                 // If a target is reached in the first 20 seconds, the score
                 // increases of 20 - the number of seconds taken to reach it.
                 // For example, if a target is reached in 5 or more seconds, but
