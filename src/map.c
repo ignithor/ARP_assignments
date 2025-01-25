@@ -292,6 +292,9 @@ int main(int argc, char *argv[]) {
 
         // Display the menu text
         refresh();
+
+        mvprintw(0, COLS / 3, "                            ");
+
         // Displaying the title of the window.
         mvprintw(0, 0, "MAP DISPLAY");
 
@@ -335,6 +338,10 @@ int main(int argc, char *argv[]) {
 
         int target_x, target_y;
         bool to_decrease = false;
+        // Get the current time
+        time_t current_time = time(NULL);
+        // Record the last time the score was decreased
+        static time_t last_score_decrease_time = 0;
         char to_send[MAX_MSG_LEN];
         // Activate color for the targets
         wattron(map_window, COLOR_PAIR(3));
@@ -349,8 +356,27 @@ int main(int argc, char *argv[]) {
             // set
             if (is_overlapping(target_y, target_x, NULL, NULL))
                 find_spot(&target_y, &target_x, drone_y, drone_x);
+            // if we touch the wall, the score decreases by 1. 
+            // The score will not decrease for 3 seconds after hitting a wall once.
+            if (drone_y == 2 || drone_y == LINES - 3 ||
+                drone_x == 1 || drone_x == COLS - 2) {
+                    if (difftime(current_time, start_time) > 10) {
+                        if (difftime(current_time, last_score_decrease_time) > 3) {
+                            score -= 1;
+                            last_score_decrease_time = current_time;
+                        }
+                    }
+                }
             if (target_x == drone_x && target_y == drone_y) {
-                time_t impact_time = time(NULL) - start_time;
+                // time_t impact_time = time(NULL) - start_time;
+<<<<<<< HEAD
+                // time_t impact_time = current_time - start_time;
+                // printf("Impact time: %ld seconds\n", impact_time);
+                
+=======
+                time_t impact_time = current_time - start_time;
+                printf("Impact time: %ld seconds\n", impact_time);
+>>>>>>> ae8841b (Add additional rules on calculation of the score)
                 // If a target is reached in the first 20 seconds, the score
                 // increases of 20 - the number of seconds taken to reach it.
                 // For example, if a target is reached in 5 or more seconds, but
@@ -360,6 +386,10 @@ int main(int argc, char *argv[]) {
                 //- 1, if impact_time >= 20
                 if (impact_time < 20.0)
                     score_increment = 20 - (int)ceil(impact_time);
+                // If we reached the target 1, the score increases by 2. 
+                if (i == 0) {   
+                    score_increment = 2;
+                }
                 else
                     score_increment = 1;
                 score = score + score_increment;
