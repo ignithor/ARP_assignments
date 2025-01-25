@@ -250,6 +250,8 @@ int main(int argc, char *argv[]) {
 
     // Initializing ncurses
     initscr();
+    // Enable to use keypad
+    // keypad(stdscr, TRUE);
     // Disable line buffering
     cbreak();
     // Disable echo of pressed characters in order to not have
