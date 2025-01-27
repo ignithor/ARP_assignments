@@ -1,12 +1,5 @@
 #include "constants.h"
 #include "wrapFuncs/wrapFunc.h"
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 
 // Function to spawn the processes
 static void spawn(char **arg_list) {

@@ -4,18 +4,11 @@
 #include "utils/utils.h"
 #include <curses.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <signal.h>
-#include <stddef.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/file.h>
-#include <sys/mman.h>
-#include <sys/select.h>
-#include <sys/signal.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
 
@@ -28,7 +21,7 @@ int Fork(void);
 int Select(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
            struct timeval *timeout);
 int Select_wmask(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
-           struct timeval *timeout);
+                 struct timeval *timeout);
 int Open(const char *file, int oflag);
 int Pipe(int *pipedes);
 int Close(int fd);

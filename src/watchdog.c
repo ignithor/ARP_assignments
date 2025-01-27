@@ -1,18 +1,7 @@
 #include "constants.h"
 #include "utils/utils.h"
 #include "wrapFuncs/wrapFunc.h"
-#include <fcntl.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/file.h>
-#include <sys/mman.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
-#include <unistd.h>
 
 // Array for processes' pids
 int p_pids[NUM_PROCESSES];

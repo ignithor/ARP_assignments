@@ -1,23 +1,9 @@
 #include "constants.h"
 #include "dataStructs.h"
-#include "ncurses.h"
 #include "utils/utils.h"
 #include "wrapFuncs/wrapFunc.h"
-#include <curses.h>
-#include <fcntl.h>
 #include <math.h>
-#include <semaphore.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/ioctl.h>
-#include <sys/mman.h>
-#include <sys/select.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <time.h>
-#include <unistd.h>
 
 // WD pid
 pid_t WD_pid;
@@ -309,7 +295,7 @@ int main(int argc, char *argv[]) {
         } else
             mvprintw(0, COLS / 3, "Score: %d", score);
         refresh();
-        
+
         // Deleting the old window that is encapsulating the map in order to
         // create the animation, and to allow the resizing of the window in case
         // of terminal resize
@@ -356,17 +342,18 @@ int main(int argc, char *argv[]) {
             // set
             if (is_overlapping(target_y, target_x, NULL, NULL))
                 find_spot(&target_y, &target_x, drone_y, drone_x);
-            // if we touch the wall, the score decreases by 1. 
-            // The score will not decrease for 3 seconds after hitting a wall once.
-            if (drone_y == 2 || drone_y == LINES - 3 ||
-                drone_x == 1 || drone_x == COLS - 2) {
-                    if (difftime(current_time, start_time) > 10) {
-                        if (difftime(current_time, last_score_decrease_time) > 3) {
-                            score -= 1;
-                            last_score_decrease_time = current_time;
-                        }
+            // if we touch the wall, the score decreases by 1.
+            // The score will not decrease for 3 seconds after hitting a wall
+            // once.
+            if (drone_y == 2 || drone_y == LINES - 3 || drone_x == 1 ||
+                drone_x == COLS - 2) {
+                if (difftime(current_time, start_time) > 10) {
+                    if (difftime(current_time, last_score_decrease_time) > 3) {
+                        score -= 1;
+                        last_score_decrease_time = current_time;
                     }
                 }
+            }
             if (target_x == drone_x && target_y == drone_y) {
                 // time_t impact_time = time(NULL) - start_time;
                 time_t impact_time = current_time - start_time;
@@ -379,11 +366,10 @@ int main(int argc, char *argv[]) {
                 //- 1, if impact_time >= 20
                 if (impact_time < 20.0)
                     score_increment = 20 - (int)ceil(impact_time);
-                // If we reached the target 1, the score increases by 2. 
-                if (i == 0) {   
+                // If we reached the target 1, the score increases by 2.
+                if (i == 0) {
                     score_increment = 2;
-                }
-                else
+                } else
                     score_increment = 1;
                 score = score + score_increment;
 

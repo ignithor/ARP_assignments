@@ -3,12 +3,7 @@
 #include "dataStructs.h"
 #include "wrapFuncs/wrapFunc.h"
 #include <cjson/cJSON.h>
-#include <ctype.h>
 #include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/file.h>
 
 float get_param(const char *process, const char *param);
 void logging(char *type, char *message);

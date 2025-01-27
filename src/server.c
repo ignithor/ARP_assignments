@@ -2,17 +2,6 @@
 #include "dataStructs.h"
 #include "utils/utils.h"
 #include "wrapFuncs/wrapFunc.h"
-#include <fcntl.h>
-#include <signal.h>
-#include <stdbool.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <sys/select.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 
 // WD pid
 pid_t WD_pid;
