@@ -3,8 +3,6 @@
 #include "utils/utils.h"
 #include "wrapFuncs/wrapFunc.h"
 
-// WD pid
-pid_t WD_pid;
 
 int main(int argc, char *argv[]) {
     // Macro to handle the watchdog signals

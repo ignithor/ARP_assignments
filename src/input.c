@@ -4,10 +4,6 @@
 #include "wrapFuncs/wrapFunc.h"
 #include <math.h>
 
-
-// WD pid
-pid_t WD_pid = -1;
-
 // Create the outer border of the window
 WINDOW *input_display_setup(int height, int width, int starty, int startx) {
     WINDOW *local_win;
@@ -325,12 +321,6 @@ int main(int argc, char *argv[]) {
         // If the user presses the p key then it's time for all the processes to
         // die in a safe way
         if (input == 'p') {
-            // This is not very elegant but the watchdog has to be killed in
-            // order to not trigger an emergency shutdown due to the lack of the
-            // already killed processes
-            if (WD_pid != -1)
-                Kill(WD_pid, SIGKILL);
-
             // Signal the server of the received STOP signal
             Write(to_server_pipe, "STOP", MAX_MSG_LEN);
             break;

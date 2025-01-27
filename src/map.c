@@ -5,9 +5,6 @@
 #include <math.h>
 #include <time.h>
 
-// WD pid
-pid_t WD_pid;
-
 // This array keeps the position of all the targets and obstacles in order to
 // perform collision checking
 int target_obstacles_screen_position[N_TARGETS + N_OBSTACLES][2];

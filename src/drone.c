@@ -4,8 +4,6 @@
 #include "wrapFuncs/wrapFunc.h"
 #include <math.h>
 
-// WD pid
-pid_t WD_pid;
 
 // This function returns the border effect given the general
 // function given in the docs folder of the project. All the parameters can be
