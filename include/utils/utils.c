@@ -15,7 +15,7 @@ float get_param(const char *process, const char *param) {
         sprintf(
             logmsg,
             "Error opening the config file /config/drone_parameters.json\n ");
-        logging(LOG_ERROR, logmsg);
+        logging("ERROR", logmsg);
         return EXIT_FAILURE; // 1
     }
     fread(jsonBuffer, 1, sizeof(jsonBuffer), config_file);
@@ -29,7 +29,7 @@ float get_param(const char *process, const char *param) {
         sprintf(
             logmsg,
             "Error parsing the config file /config/drone_parameters.json\n ");
-        logging(LOG_ERROR, logmsg);
+        logging("ERROR", logmsg);
         return EXIT_FAILURE;
     }
 
@@ -38,7 +38,7 @@ float get_param(const char *process, const char *param) {
     if (!process_obj) {
         printf("Process not found: %s\n", process);
         sprintf(logmsg, "Error process not found: %s\n", process);
-        logging(LOG_ERROR, logmsg);
+        logging("ERROR", logmsg);
         cJSON_Delete(json);
         return -1;
     }
@@ -49,7 +49,7 @@ float get_param(const char *process, const char *param) {
         printf("Parameter not found or not a number: %s\n", param);
         sprintf(logmsg, "Error parameter not found or not a number: %s\n",
                 param);
-        logging(LOG_ERROR, logmsg);
+        logging("ERROR", logmsg);
         cJSON_Delete(json);
         return -1;
     }
@@ -109,12 +109,12 @@ void tokenization(struct pos *arr_to_fill, char *to_tokenize,
         arr_to_fill[0].x = aux_x;
         arr_to_fill[0].y = aux_y;
         // Log the processed token
-        logging(LOG_INFO, token);
+        logging("INFO", token);
         // Does the same thing as before but this time is put in a loop to
         // process the whole string
         while ((token = strtok_r(NULL, "|", &aux_ptr)) != NULL) {
             sscanf(token, "%f,%f", &aux_x, &aux_y);
-            logging(LOG_INFO, token);
+            logging("INFO", token);
             arr_to_fill[index].x = aux_x;
             arr_to_fill[index].y = aux_y;
             index++;

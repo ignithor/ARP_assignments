@@ -4,7 +4,6 @@
 #include "wrapFuncs/wrapFunc.h"
 #include <math.h>
 
-
 // This function returns the border effect given the general
 // function given in the docs folder of the project. All the parameters can be
 // modified from the configuration file.
@@ -144,7 +143,7 @@ int main(int argc, char *argv[]) {
             targ_of_effect = get_param("drone", "targ_of_effect");
 
             // Logging
-            logging(LOG_INFO, "Drone has updated its parameters");
+            logging("INFO", "Drone has updated its parameters");
         }
         // The semaphore is taken in order to read the force components as
         // given by the user in the input process
@@ -167,7 +166,7 @@ int main(int argc, char *argv[]) {
                 if (ret == 0) {
                     // If a pipe gets closed then notify and remove it from
                     // master
-                    logging(LOG_WARN, "Pipe closed in drone");
+                    logging("WARN", "Pipe closed in drone");
                     Close(i);
                     FD_CLR(i, &master);
                 }
@@ -196,7 +195,7 @@ int main(int argc, char *argv[]) {
                                        targets_arr[target_index].y, target_x,
                                        target_y);
                                 fflush(stdout);
-                                logging(LOG_ERROR,
+                                logging("ERROR",
                                         "Mismatched target and array in drone");
                             } else {
                                 // If index and positions match then remove it
@@ -209,16 +208,16 @@ int main(int argc, char *argv[]) {
                         } else {
                             // If only T is received then new targets have been
                             // produced
-                            logging(LOG_INFO, "vvvvvvvvDRONE-TARGvvvvvvv");
+                            logging("INFO", "vvvvvvvvDRONE-TARGvvvvvvv");
                             tokenization(targets_arr, received, &targets_num);
-                            logging(LOG_INFO, "^^^^^^^^DRONE-TARG^^^^^^^");
+                            logging("INFO", "^^^^^^^^DRONE-TARG^^^^^^^");
                         }
                         break;
                     case 'O':
                         // If O then new obstacles have been produced
-                        logging(LOG_INFO, "vvvvvvvvDRONE-OBSTvvvvvvv");
+                        logging("INFO", "vvvvvvvvDRONE-OBSTvvvvvvv");
                         tokenization(obstacles_arr, received, &obstacles_num);
-                        logging(LOG_INFO, "^^^^^^^^DRONE-OBST^^^^^^^");
+                        logging("INFO", "^^^^^^^^DRONE-OBST^^^^^^^");
                         break;
                     default:
                         // If none of the above then the input has sent the

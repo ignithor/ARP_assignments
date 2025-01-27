@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
         sprintf(to_send, "O");
 
         // Logging the correct generation
-        logging(LOG_INFO, "Obstacles process generated a new set of obstacles");
+        logging("INFO", "Obstacles process generated a new set of obstacles");
 
         // Resetting the fd_sets
         reader = master;
@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
                 // If closed pipe close fd
                 Close(from_server_pipe);
                 FD_CLR(from_server_pipe, &master);
-                logging(LOG_WARN, "Pipe to obstacles closed");
+                logging("WARN", "Pipe to obstacles closed");
             }
             // If STOP received then stop everything
             if (!strcmp(received, "STOP")) {

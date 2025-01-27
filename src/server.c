@@ -3,7 +3,6 @@
 #include "utils/utils.h"
 #include "wrapFuncs/wrapFunc.h"
 
-
 int main(int argc, char *argv[]) {
     // Macro to handle the watchdog signals
     HANDLE_WATCHDOG_SIGNALS();
@@ -107,7 +106,7 @@ int main(int argc, char *argv[]) {
                                 drone_current_pos.y);
                         Write(to_map_pipe, to_send, MAX_MSG_LEN);
                     } else if (i == from_map_pipe) {
-                        logging(LOG_INFO, received);
+                        logging("INFO", received);
                         if (!strcmp(received, "GE")) {
                             // If we have GE sent by the map then send to target
                             // so it can produce new targets

@@ -7,19 +7,15 @@
 #define FIFO1_PATH "./fifo_one"
 #define FIFO2_PATH "./fifo_two"
 
-#define SIMULATION_WIDTH 500
-#define SIMULATION_HEIGHT 500
+#define SIMULATION_WIDTH 400
+#define SIMULATION_HEIGHT 400
 #define ZERO_THRESHOLD 0.1
-
-#define LOG_INFO "INFO"
-#define LOG_WARN "WARN"
-#define LOG_ERROR "ERROR"
 
 #define MAX_STR_LEN 300
 #define MAX_MSG_LEN 1024
 
 #define N_TARGETS 9
-#define N_OBSTACLES 9
+#define N_OBSTACLES 20
 
 // Maximum combined force from the obstacles
 #define MAX_OBST_FORCES 1000

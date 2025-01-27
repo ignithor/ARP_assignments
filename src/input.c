@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
                 reading_params_interval = 1;
             force_step = get_param("input", "force_step");
             max_force  = get_param("input", "max_force");
-            logging(LOG_INFO, "Input has updated its parameters");
+            logging("INFO", "Input has updated its parameters");
         }
 
         // Getting user input if present
@@ -338,7 +338,7 @@ int main(int argc, char *argv[]) {
             sprintf(aux_force, "%f|%f", drone_current_force.x_component,
                     drone_current_force.y_component);
             Write(to_server_pipe, aux_force, MAX_MSG_LEN);
-            logging(LOG_INFO, "New input force send to the server");
+            logging("INFO", "New input force send to the server");
         }
 
         // Send update request to server

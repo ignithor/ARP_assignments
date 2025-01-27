@@ -11,7 +11,7 @@ int Wait(int *wstatus) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -30,7 +30,7 @@ int Waitpid(pid_t pid, int *wstatus, int options) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -49,7 +49,7 @@ int Execvp(const char *file, char **args) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -68,7 +68,7 @@ int Fork(void) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -97,7 +97,7 @@ int Read(int fd, void *buf, size_t nbytes) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         sleep(100);
         exit(EXIT_FAILURE);
     }
@@ -126,7 +126,7 @@ int Write(int fd, void *buf, size_t nbytes) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         sleep(100);
         exit(EXIT_FAILURE);
     }
@@ -166,7 +166,7 @@ int Select_wmask(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -185,7 +185,7 @@ int Open(const char *file, int oflag) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -204,7 +204,7 @@ int Pipe(int *pipedes) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -223,7 +223,7 @@ int Close(int fd) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -242,7 +242,7 @@ int Flock(int fd, int operation) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -261,7 +261,7 @@ FILE *Fopen(const char *pathname, const char *mode) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -280,7 +280,7 @@ void Kill(int pid, int signal) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         exit(EXIT_FAILURE);
     }
 }
@@ -303,7 +303,7 @@ void Mkfifo(const char *fifo_path, int permit) {
                     strerror(errno), getpid(), __FILE__, __LINE__);
             printf("%s\n", msg);
             fflush(stdout);
-            logging(LOG_ERROR, msg);
+            logging("ERROR", msg);
             getchar();
             exit(EXIT_FAILURE);
         }
@@ -322,7 +322,7 @@ void Sigaction(int signum, const struct sigaction *act,
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -339,7 +339,7 @@ void Sigprocmask(int type, const sigset_t *mask, sigset_t *oldset) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         getchar();
         exit(EXIT_FAILURE);
     }
@@ -357,7 +357,7 @@ void Fclose(FILE *stream) {
                 strerror(errno), getpid(), __FILE__, __LINE__);
         printf("%s\n", msg);
         fflush(stdout);
-        logging(LOG_ERROR, msg);
+        logging("ERROR", msg);
         exit(EXIT_FAILURE);
     }
 }

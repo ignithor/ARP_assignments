@@ -57,13 +57,13 @@ int main(int argc, char *argv[]) {
         // untill the server sends a new GE
         Read(from_server_pipe, received, MAX_MSG_LEN);
         if (!strcmp(received, "GE")) {
-            logging(LOG_INFO, "Received GE");
+            logging("INFO", "Received GE");
         } else if (!strcmp(received, "STOP")) {
             // Otherwise if it's STOP close everything
             break;
         }
         // Log if new targets have been produced
-        logging(LOG_INFO, "Target process generated a new set of targets");
+        logging("INFO", "Target process generated a new set of targets");
     }
 
     // Cleaning up

@@ -125,7 +125,7 @@ void find_spot(int *old_y, int *old_x, int drone_y, int drone_x) {
         // If the index is growing too much than it means that there is no more
         // a free position available
         if (index > 100) {
-            logging(LOG_ERROR,
+            logging("ERROR",
                     "Unable to find a spot on the screen to print on map");
             exit(EXIT_FAILURE);
         }
@@ -238,7 +238,7 @@ int main(int argc, char *argv[]) {
             if (read_ret == 0) {
                 Close(from_server);
                 FD_CLR(from_server, &master);
-                logging(LOG_WARN, "Pipe to map closed");
+                logging("WARN", "Pipe to map closed");
             } else {
                 char aux[100];
                 // If STOP then this needs to be closed
@@ -252,21 +252,19 @@ int main(int argc, char *argv[]) {
                         break;
                     case 'O':
                         // O indicates that new obstacles are available
-                        logging(LOG_INFO,
-                                "vvvvvvvvvvvOBSTACLESvvvvvvvvvvvvvvv");
+                        logging("INFO", "vvvvvvvvvvvOBSTACLESvvvvvvvvvvvvvvv");
                         tokenization(obstacles_pos, received, &obstacles_num);
-                        logging(LOG_INFO,
-                                "^^^^^^^^^^^OBSTACLES^^^^^^^^^^^^^^^");
+                        logging("INFO", "^^^^^^^^^^^OBSTACLES^^^^^^^^^^^^^^^");
                         sprintf(aux, "Obtacles %d", obstacles_num);
-                        logging(LOG_INFO, aux);
+                        logging("INFO", aux);
                         break;
                     case 'T':
                         // T means that new targets are available
-                        logging(LOG_INFO, "vvvvvvvvvvvTARGETSvvvvvvvvvvvvvvv");
+                        logging("INFO", "vvvvvvvvvvvTARGETSvvvvvvvvvvvvvvv");
                         tokenization(targets_pos, received, &target_num);
-                        logging(LOG_INFO, "^^^^^^^^^^^TARGETS^^^^^^^^^^^^^^^");
+                        logging("INFO", "^^^^^^^^^^^TARGETS^^^^^^^^^^^^^^^");
                         sprintf(aux, "Targets %d", target_num);
-                        logging(LOG_INFO, aux);
+                        logging("INFO", aux);
                         start_time = time(NULL);
                         break;
                 }

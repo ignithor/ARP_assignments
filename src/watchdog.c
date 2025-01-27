@@ -118,7 +118,7 @@ int main(int argc, char *argv[]) {
 
             // Writing in the logfile which process the WD sent a signal to
             sprintf(logmsg, "WD sending signal to %d", p_pids[i]);
-            logging(LOG_INFO, logmsg);
+            logging("INFO", logmsg);
 
             // This may seem strange but is required because signals may
             // interrupt sleep. Sleep when interrupted returns the amount of
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
                         "WD killed all processes because of process"
                         " with pid %d",
                         fault_pid);
-                logging(LOG_WARN, logmsg);
+                logging("WARN", logmsg);
 
                 // Killing all processes, except Konsole's
                 for (int i = 0; i < NUM_PROCESSES - 1; i++) {
