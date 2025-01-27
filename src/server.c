@@ -64,9 +64,9 @@ int main(int argc, char *argv[]) {
     FD_SET(from_map_pipe, &master);
 
     // Setting the maxfd
-    int maxfd = max(max(max(from_drone_pipe, from_input_pipe),
-                        max(from_map_pipe, from_obstacles_pipe)),
-                    max(from_target_pipe, from_map_pipe));
+    int maxfd =
+        max_of_many(6, from_drone_pipe, from_input_pipe, from_map_pipe,
+                    from_obstacles_pipe, from_target_pipe, from_map_pipe);
 
     bool to_exit = false;
     while (1) {

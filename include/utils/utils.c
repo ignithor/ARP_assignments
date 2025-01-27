@@ -71,11 +71,19 @@ void logging(char *type, char *message) {
     Fclose(F);
 }
 
-// basic max function
-int max(int a, int b) {
-    if (a >= b)
-        return a;
-    return b;
+// Max function for several values
+int max_of_many(int count, ...) {
+    va_list args;
+    va_start(args, count);
+    int max_val = va_arg(args, int);
+    for (int i = 1; i < count; i++) {
+        int value = va_arg(args, int);
+        if (value > max_val) {
+            max_val = value;
+        }
+    }
+    va_end(args);
+    return max_val;
 }
 
 void tokenization(struct pos *arr_to_fill, char *to_tokenize,
