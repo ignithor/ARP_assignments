@@ -1,12 +1,23 @@
 #ifndef WRAPFUNC
 #define WRAPFUNC
-#include <semaphore.h>
+#include "constants.h"
+#include "utils/utils.h"
+#include <curses.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <signal.h>
 #include <stddef.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sys/file.h>
 #include <sys/mman.h>
 #include <sys/select.h>
 #include <sys/signal.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 int Wait(int *wstatus);
 int Waitpid(pid_t pid, int *wstatus, int options);
@@ -21,15 +32,6 @@ int Select_wmask(int nfds, fd_set *readfds, fd_set *writefds, fd_set *exceptfds,
 int Open(const char *file, int oflag);
 int Pipe(int *pipedes);
 int Close(int fd);
-int Shm_open(const char *name, int flag, __mode_t mode);
-int Ftruncate(int fd, __off_t length);
-void *Mmap(void *addr, size_t len, int prot, int flags, int fd, __off_t offset);
-sem_t *Sem_open(const char *name, int oflag, mode_t mode, unsigned int value);
-int Sem_init(sem_t *sem, int pshared, int value);
-int Sem_wait(sem_t *sem);
-int Sem_post(sem_t *sem);
-int Sem_close(sem_t *sem);
-int Sem_unlink(const char *name);
 FILE *Fopen(const char *pathname, const char *mode);
 int Flock(int fd, int operation);
 void Kill(int pid, int signal);
@@ -39,6 +41,4 @@ void Sigaction(int signum, const struct sigaction *act,
                struct sigaction *oldact);
 void Sigprocmask(int type, const sigset_t *mask, sigset_t *oldset);
 void Fclose(FILE *stream);
-void Shm_unlink(const char *name);
-void Munmap(void *addr, size_t len);
 #endif // !WRAPFUNC

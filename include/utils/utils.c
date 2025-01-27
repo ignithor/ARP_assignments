@@ -5,13 +5,13 @@ float get_param(const char *process, const char *param) {
 
     FILE *config_file;
     char jsonBuffer[1000];
+    char logmsg[300];
 
     // Open the config file
     // The relative path is used and the executable is in the bin folder
     config_file = fopen("../config/drone_parameters.json", "r");
     if (config_file == NULL) {
         perror("Error opening the config file /config/drone_parameters.json");
-        char logmsg[300];
         sprintf(
             logmsg,
             "Error opening the config file /config/drone_parameters.json\n ");
@@ -26,7 +26,6 @@ float get_param(const char *process, const char *param) {
 
     if (json == NULL) {
         perror("Error parsing JSON file\n");
-        char logmsg[300];
         sprintf(
             logmsg,
             "Error parsing the config file /config/drone_parameters.json\n ");
@@ -38,7 +37,6 @@ float get_param(const char *process, const char *param) {
     cJSON *process_obj = cJSON_GetObjectItem(json, process);
     if (!process_obj) {
         printf("Process not found: %s\n", process);
-        char logmsg[300];
         sprintf(logmsg, "Error process not found: %s\n", process);
         logging(LOG_ERROR, logmsg);
         cJSON_Delete(json);
@@ -49,7 +47,6 @@ float get_param(const char *process, const char *param) {
     cJSON *param_obj = cJSON_GetObjectItem(process_obj, param);
     if (!param_obj || !cJSON_IsNumber(param_obj)) {
         printf("Parameter not found or not a number: %s\n", param);
-        char logmsg[300];
         sprintf(logmsg, "Error parameter not found or not a number: %s\n",
                 param);
         logging(LOG_ERROR, logmsg);
@@ -62,7 +59,7 @@ float get_param(const char *process, const char *param) {
     return value;
 }
 
-// Function to log messages in the logfile
+// Function to write log messages in the logfile
 void logging(char *type, char *message) {
     FILE *F;
     F = Fopen(LOGFILE_PATH, "a");
