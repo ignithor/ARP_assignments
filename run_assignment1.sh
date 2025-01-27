@@ -6,6 +6,9 @@ if [ -d "bin" ]; then
   rm -r bin
 fi
 
+touch log/process.log
+> log/process.log
+
 mkdir build
 cd build
 # Generating make file
