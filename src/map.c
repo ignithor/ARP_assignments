@@ -13,7 +13,7 @@ int target_obstacles_screen_position[N_TARGETS + N_OBSTACLES][2];
 int tosp_top = -1;
 
 // Create buffer for the event reason
-char event_reason[50] = "None";
+char event_reason[50] = "";
 
 // Create the outer border of the window
 WINDOW *create_map_win(int height, int width, int starty, int startx) {
@@ -155,6 +155,9 @@ int main(int argc, char *argv[]) {
     // time when the target are spawned
     time_t start_time;
 
+    // Record the last time the target was hit
+    time_t last_target_reached_time = 0;
+
     // Named pipe (fifo) to send the pid to the WD
     Mkfifo(FIFO1_PATH, 0666);
 
@@ -173,7 +176,7 @@ int main(int argc, char *argv[]) {
 
     // Setting up the struct in which to store the position of the drone
     // in order to calculate the current position on the screen of the drone
-    struct pos drone_pos = {0, 0};
+    struct pos drone_pos = {0,0};
 
     // Arrays managed as stacks where to save the position of targets and
     // obstacles
@@ -286,16 +289,16 @@ int main(int argc, char *argv[]) {
             mvaddch(0, x, ' '); 
         }
 
-        if (score > 0) {
+        if (score_increment > 0) {
             attron(COLOR_PAIR(3));
-            mvprintw(0, COLS / 5, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
+            mvprintw(0, COLS / 5, "Score: %d | %s %d points", score, event_reason, score_increment);
             attroff(COLOR_PAIR(3));
-        } else if (score < 0) {
+        } else if (score_increment < 0) {
             attron(COLOR_PAIR(2));
-            mvprintw(0, COLS / 5, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
-            attroff(COLOR_PAIR(2));
+            mvprintw(0, COLS / 5, "Score: %d | %s %d point", score, event_reason, - score_increment);
+            attroff(COLOR_PAIR(1));
         } else
-            mvprintw(0, COLS / 5, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
+            mvprintw(0, COLS / 5, "Start playing the game!");
         refresh();
 
         // Deleting the old window that is encapsulating the map in order to
@@ -330,8 +333,6 @@ int main(int argc, char *argv[]) {
         time_t current_time = time(NULL);
         // Record the last time the score was decreased
         static time_t last_score_decrease_time = 0;
-        // Record the last time the target was hit
-        static time_t last_target_reached_time = 0;
 
         char to_send[MAX_MSG_LEN];
         // Activate color for the targets
@@ -358,12 +359,14 @@ int main(int argc, char *argv[]) {
                         score = score + score_increment;
                         // score -= 1;
                         last_score_decrease_time = current_time;
-                        snprintf(event_reason, sizeof(event_reason), "Wall Hit");
+                        snprintf(event_reason, sizeof(event_reason), "You hit the wall! You lost");
                     }
                 }
             }
             if (target_x == drone_x && target_y == drone_y) {
                 time_t impact_time = current_time - last_target_reached_time;
+                mvprintw(0, 4*COLS / 5, "%ld", (long)impact_time);
+
                 // If a target is reached in the first 20 seconds, the score
                 // increases of 20 - the number of seconds taken to reach it.
                 // For example, if a target is reached in 5 or more seconds, but
@@ -380,7 +383,7 @@ int main(int argc, char *argv[]) {
                     score_increment = 2;
                 score = score + score_increment;
                 last_target_reached_time = time(NULL);
-                snprintf(event_reason, sizeof(event_reason), "Target %d Reached", i + 1);
+                snprintf(event_reason, sizeof(event_reason), "You reached the target %d! You got", i + 1);
                 
                 // If the target position is the same as the drone then we have
                 // a hit
