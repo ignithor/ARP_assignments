@@ -1,5 +1,5 @@
-#ifndef DATASTRUCTS_H
-#define DATASTRUCTS_H
+#ifndef DRONEDATASTRUCT_H
+#define DRONEDATASTRUCT_H
 
 struct force {
     float x_component;

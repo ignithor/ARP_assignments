@@ -1,7 +1,9 @@
-#pragma once
+#ifndef UTILITY_H
+#define UTILITY_H
+
 #include "constants.h"
-#include "dataStructs.h"
-#include "wrapFuncs/wrapFunc.h"
+#include "droneDataStructs.h"
+#include "wrappers/wrappers.h"
 #include <cjson/cJSON.h>
 #include <signal.h>
 
@@ -22,3 +24,5 @@ void signal_handler(int signo, siginfo_t *info, void *context);
         sa.sa_flags = SA_SIGINFO | SA_RESTART;                                 \
         sigaction(SIGUSR1, &sa, NULL);                                         \
     }
+
+#endif // !UTILITY_H

@@ -1,5 +1,5 @@
 #include "constants.h"
-#include "wrapFuncs/wrapFunc.h"
+#include "wrappers/wrappers.h"
 
 // Function to spawn the processes
 static void spawn(char **arg_list) {

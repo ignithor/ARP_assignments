@@ -1,7 +1,7 @@
-#ifndef WRAPFUNC
-#define WRAPFUNC
+#ifndef WRAPPERS_H
+#define WRAPPERS_H
 #include "constants.h"
-#include "utils/utils.h"
+#include "utility/utility.h"
 #include <curses.h>
 #include <errno.h>
 #include <signal.h>
@@ -34,4 +34,4 @@ void Sigaction(int signum, const struct sigaction *act,
                struct sigaction *oldact);
 void Sigprocmask(int type, const sigset_t *mask, sigset_t *oldset);
 void Fclose(FILE *stream);
-#endif // !WRAPFUNC
+#endif // !WRAPPERS_H

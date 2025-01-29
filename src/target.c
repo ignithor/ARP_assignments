@@ -1,6 +1,6 @@
 #include "constants.h"
-#include "utils/utils.h"
-#include "wrapFuncs/wrapFunc.h"
+#include "utility/utility.h"
+#include "wrappers/wrappers.h"
 #include <time.h>
 
 int main(int argc, char *argv[]) {

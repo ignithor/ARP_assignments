@@ -1,7 +1,7 @@
 #include "constants.h"
-#include "dataStructs.h"
-#include "utils/utils.h"
-#include "wrapFuncs/wrapFunc.h"
+#include "droneDataStructs.h"
+#include "utility/utility.h"
+#include "wrappers/wrappers.h"
 #include <math.h>
 
 // This function returns the border effect given the general

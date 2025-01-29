@@ -1,6 +1,6 @@
 #include "constants.h"
-#include "utils/utils.h"
-#include "wrapFuncs/wrapFunc.h"
+#include "utility/utility.h"
+#include "wrappers/wrappers.h"
 #include <time.h>
 
 char received[MAX_MSG_LEN];

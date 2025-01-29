@@ -1,4 +1,4 @@
-#include "wrapFuncs/wrapFunc.h"
+#include "wrappers/wrappers.h"
 
 int Wait(int *wstatus) {
     int ret = wait(wstatus);

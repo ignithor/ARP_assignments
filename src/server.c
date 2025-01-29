@@ -1,7 +1,7 @@
 #include "constants.h"
-#include "dataStructs.h"
-#include "utils/utils.h"
-#include "wrapFuncs/wrapFunc.h"
+#include "droneDataStructs.h"
+#include "utility/utility.h"
+#include "wrappers/wrappers.h"
 
 int main(int argc, char *argv[]) {
     // Macro to handle the watchdog signals

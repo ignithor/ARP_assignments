@@ -7,37 +7,37 @@ message(STATUS "cJSON library found at: ${CJSON_LIB}")
 
 # Setting macros for files
 set(WRAP_FUNC_FILES
-    wrapFuncs/wrapFunc.h
-    wrapFuncs/wrapFunc.c)
+    wrappers/wrappers.h
+    wrappers/wrappers.c)
 
 set(UTILS_FILES
-    utils/utils.h
-    utils/utils.c)
+    utility/utility.h
+    utility/utility.c)
 
 # Setting libraries names for those files
-add_library(wrapFunc ${WRAP_FUNC_FILES})
-add_library(utils ${UTILS_FILES})
+add_library(wrappers ${WRAP_FUNC_FILES})
+add_library(utility ${UTILS_FILES})
 
 # setting the building interface in order to have a correct include interface
 target_include_directories(
-    wrapFunc
+    wrappers
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     )
 
 target_include_directories(
-    utils
+    utility
     PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     PRIVATE /usr/include
     )
 
-target_link_libraries(utils PRIVATE ${CJSON_LIB})
-target_link_libraries(wrapFunc utils)
+target_link_libraries(utility PRIVATE ${CJSON_LIB})
+target_link_libraries(wrappers utility)
 
 # Adding header only libraries
 add_library(constants INTERFACE)
-add_library(datastructs INTERFACE)
+add_library(dronedatastructs INTERFACE)
 
 # Adding files for those libraries
 target_include_directories(
@@ -47,7 +47,7 @@ target_include_directories(
     )
 
 target_include_directories(
-    datastructs
+    dronedatastructs
     INTERFACE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../include>
     )
