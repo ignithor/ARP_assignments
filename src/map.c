@@ -288,14 +288,14 @@ int main(int argc, char *argv[]) {
 
         if (score > 0) {
             attron(COLOR_PAIR(3));
-            mvprintw(0, COLS / 4, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
+            mvprintw(0, COLS / 5, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
             attroff(COLOR_PAIR(3));
         } else if (score < 0) {
             attron(COLOR_PAIR(2));
-            mvprintw(0, COLS / 4, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
+            mvprintw(0, COLS / 5, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
             attroff(COLOR_PAIR(2));
         } else
-            mvprintw(0, COLS / 4, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
+            mvprintw(0, COLS / 5, "Score: %d | Last Event: %s, Score is changed by %d", score, event_reason, score_increment);
         refresh();
 
         // Deleting the old window that is encapsulating the map in order to
@@ -350,8 +350,8 @@ int main(int argc, char *argv[]) {
             // if we touch the wall, the score decreases by 1.
             // The score will not decrease for 3 seconds after hitting a wall
             // once.
-            if (drone_y == 2 || drone_y == LINES - 3 || drone_x == 1 ||
-                drone_x == COLS - 2) {
+            if (drone_pos.y < 1 || drone_pos.y > SIMULATION_HEIGHT - 1 || drone_pos.x < 1 ||
+                drone_pos.x > SIMULATION_WIDTH - 1) {
                 if (difftime(current_time, start_time) > 10) {
                     if (difftime(current_time, last_score_decrease_time) > 3) {
                         score_increment = -1;
