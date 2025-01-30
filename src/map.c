@@ -4,6 +4,11 @@
 #include "wrapFuncs/wrapFunc.h"
 #include <math.h>
 #include <time.h>
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/publisher/Publisher.hpp>
+#include <fastdds/dds/subscriber/Subscriber.hpp>
+#include <fastdds/dds/topic/Topic.hpp>
 
 // This array keeps the position of all the targets and obstacles in order to
 // perform collision checking

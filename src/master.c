@@ -1,5 +1,10 @@
 #include "constants.h"
 #include "wrapFuncs/wrapFunc.h"
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/publisher/Publisher.hpp>
+#include <fastdds/dds/subscriber/Subscriber.hpp>
+#include <fastdds/dds/topic/Topic.hpp>
 
 // Function to spawn the processes
 static void spawn(char **arg_list) {

@@ -2,6 +2,11 @@
 #include "utils/utils.h"
 #include "wrapFuncs/wrapFunc.h"
 #include <time.h>
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/publisher/Publisher.hpp>
+#include <fastdds/dds/subscriber/Subscriber.hpp>
+#include <fastdds/dds/topic/Topic.hpp>
 
 char received[MAX_MSG_LEN];
 

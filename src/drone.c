@@ -3,6 +3,11 @@
 #include "utils/utils.h"
 #include "wrapFuncs/wrapFunc.h"
 #include <math.h>
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/publisher/Publisher.hpp>
+#include <fastdds/dds/subscriber/Subscriber.hpp>
+#include <fastdds/dds/topic/Topic.hpp>
 
 // This function returns the border effect given the general
 // function given in the docs folder of the project. All the parameters can be

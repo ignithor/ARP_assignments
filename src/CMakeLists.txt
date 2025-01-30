@@ -2,7 +2,10 @@ project("ARP_assignments")
 
 # Searching for curses
 find_package(Curses REQUIRED)
+find_package(fastcdr REQUIRED)
+find_package(fastrtps REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
+include_directories(${FASTDDS_INCLUDE_DIR})
 
 # Adding executables with realative files
 add_executable(master master.c)
@@ -23,3 +26,6 @@ target_link_libraries(watchdog wrapFunc constants utils)
 target_link_libraries(input wrapFunc constants datastructs utils m ${CURSES_LIBRARIES})
 target_link_libraries(target wrapFunc constants utils)
 target_link_libraries(obstacle wrapFunc constants utils)
+target_link_libraries(drone fastrtps fastcdr)
+target_link_libraries(server fastrtps fastcdr)
+target_link_libraries(master fastrtps fastcdr)
