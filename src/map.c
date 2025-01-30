@@ -364,6 +364,11 @@ int main(int argc, char *argv[]) {
             }
             if (target_x == drone_x && target_y == drone_y) {
                 time_t impact_time = current_time - last_target_reached_time;
+                float impact = (float)impact_time;
+                char message[100];
+                sprintf(message, "impact time %f", impact);
+                logging("INFO", message);
+
                 // If a target is reached in the first 20 seconds, the score
                 // increases of 20 - the number of seconds taken to reach it.
                 // For example, if a target is reached in 5 or more seconds, but
