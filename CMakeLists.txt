@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 
-project("ARP_assignments")
+project("ARP_assignments" C CXX)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 

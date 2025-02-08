@@ -1,11 +1,31 @@
+#include <fastdds/dds/domain/DomainParticipant.hpp>
+#include <fastdds/dds/domain/DomainParticipantFactory.hpp>
+#include <fastdds/dds/publisher/DataWriter.hpp>
+#include <fastdds/dds/publisher/DataWriterListener.hpp>
+#include <fastdds/dds/publisher/Publisher.hpp>
+#include <fastdds/dds/topic/TypeSupport.hpp>
+#include <iostream>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "constants.h"
-#include "utility/utility.h"
+// #include "utility/utility.h"
 #include "wrappers/wrappers.h"
 #include <time.h>
 
+#ifdef __cplusplus
+}
+#endif
+
 int main(int argc, char *argv[]) {
-    // Macro to handle the watchdog signals
-    HANDLE_WATCHDOG_SIGNALS();
+
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_sigaction = signal_handler;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = SA_SIGINFO | SA_RESTART;
+    sigaction(SIGUSR1, &sa, NULL);
 
     // Specifying that argc and argv are unused variables
     int to_server_pipe, from_server_pipe;
