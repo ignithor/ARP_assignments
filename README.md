@@ -36,21 +36,40 @@ For assignment 2 :
 To change from assignment 1 and 2, you can do 
     git checkout assignment
 
-### Rules of the game
+## Rules of the game
+The score is updated based on the following conditions.
 
-TODO @Yui
+### Score Increment Rules
+- **If \( t <= 20 \):**
+  - If the target number is 1:  
+    `score_increment = 4 + (20 - t)`
+  - If the target number is not 1:  
+    `score_increment = 2`
+- **If \( t > 20 \):**
+  - If the target number is 1:  
+    `score_increment = 4`
+  - If the target number is not 1:  
+    `score_increment = 2`
 
-The score increment for the current game is calculated with the following formula:
+### Penalty Rules
+- **If the player hits a wall:**  
+  The score is decreased by 1:  
+  `score_decrement = 1`
 
-```math
-score\_increment =
-\begin{cases}
-    15 - ⌊t⌋, & \text{if } t < 15 \\
-    4, & \text{if } t \geq 20 for target 1
-\end{cases}
-```
+Summary table of the scoring rules is shown below.
 
-where ⌊t⌋ is the time taken by the drone to reach the target starting from the instant when the targets are spawned in the map.
+| Condition        | Target Number | Score Change         |
+|------------------|---------------|----------------------|
+|  t < 20      | 1             | 4 + (20 - t)   |
+|  t < 20      | Not 1         | +2       |
+|  t >= 20  | 1             | +4              |
+|  t >= 20  | Not 1         | +2              |
+| Hit a wall       | -             | -1              |
+
+This ensures that:
+- Hitting a new target quickly rewards the player more when the target number is 1.
+- All other target hits follow a fixed increment.
+- Hitting a wall results in a penalty, reducing the score by 1.
 
 ## Technical notes
 
