@@ -4,88 +4,66 @@
 #include "wrappers/wrappers.h"
 #include <math.h>
 #include <time.h>
-
-// This array keeps the position of all the targets and obstacles in order to
-// perform collision checking
+/* 
+ * Global variables to track screen positions of targets and obstacles.
+ * Used to check collisions or overlap with the drone.
+ */
 int target_obstacles_screen_position[N_TARGETS + N_OBSTACLES][2];
+int tosp_top = -1; // Tracks the top index of the position array stack.
 
-// Index for keeping track of the previous array that is handled like a stack
-int tosp_top = -1;
-
-// Create buffer for the event reason
+// Buffer for logging event reasons.
 char event_reason[50] = "";
 
-// Create the outer border of the window
+// Functions
+/* 
+ * Creates the map window for the simulation.
+ * Draws a border around the specified dimensions.
+ */
 WINDOW *create_map_win(int height, int width, int starty, int startx) {
-    WINDOW *local_win;
-
-    local_win = newwin(height, width, starty, startx);
-    box(local_win, 0, 0); /* 0, 0 gives default characters
-                           * for the vertical and horizontal
-                           * lines			*/
+    WINDOW *local_win = newwin(height, width, starty, startx);
+    box(local_win, 0, 0); // Draws a border around the window.
     return local_win;
 }
 
-// Destroy the map window. Useful to refresh the window once the terminal is
-// resized
+/*
+ * Clears and destroys a specified map window.
+ * Useful for refreshing or resizing the map window dynamically.
+ */
 void destroy_map_win(WINDOW *local_win) {
-    wborder(local_win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
-    /* The parameters taken are
-     * 1. win: the window on which to operate
-     * 2. ls: character to be used for the left side of the window
-     * 3. rs: character to be used for the right side of the window
-     * 4. ts: character to be used for the top side of the window
-     * 5. bs: character to be used for the bottom side of the window
-     * 6. tl: character to be used for the top left corner of the window
-     * 7. tr: character to be used for the top right corner of the window
-     * 8. bl: character to be used for the bottom left corner of the window
-     * 9. br: character to be used for the bottom right corner of the window
-     */
-    wrefresh(local_win);
-    delwin(local_win);
+    wborder(local_win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '); // Removes the window border.
+    wrefresh(local_win); // Refreshes the display.
+    delwin(local_win);   // Deletes the window.
 }
 
+/* 
+ * Checks if a given position (x, y) overlaps with the drone or other targets/obstacles.
+ * Also ensures the position is within the valid display boundaries.
+ */
 bool is_overlapping(int y, int x, int *drone_y, int *drone_x) {
-    // This is not strictly overlapping checking but here allows for less code
-    // repetition. This checks if the obstacle or target is inside the
-    // boundaries If not then it's not a valid position
-    if (y < 1 || x < 1 || y > LINES - 3 || x > COLS - 2)
-        return true;
+    if (y < 1 || x < 1 || y > LINES - 3 || x > COLS - 2) return true; // Out of bounds.
 
-    // Checking for overlapping with drone if obstacle
-    if (drone_y != NULL && drone_x != NULL)
-        if (*drone_y == y && *drone_x == x)
-            return true;
-    // Checking for overlapping with other targets or obstacles
+    // Check if it overlaps with the drone's position.
+    if (drone_y != NULL && drone_x != NULL && *drone_y == y && *drone_x == x) return true;
+
+    // Check for overlap with targets or obstacles.
     for (int i = 0; i <= tosp_top; i++) {
-        if (y == target_obstacles_screen_position[i][0] &&
-            x == target_obstacles_screen_position[i][1])
-            return true;
+        if (y == target_obstacles_screen_position[i][0] && x == target_obstacles_screen_position[i][1]) return true;
     }
     return false;
 }
 
+/* 
+ * Finds a valid position around a given (old_y, old_x).
+ * Expands outward in a square pattern until a valid spot is found.
+ */
 void find_spot(int *old_y, int *old_x, int drone_y, int drone_x) {
-    // Function to find a valid spot for the obstacles or targets to be
-    // positioned It searches arond the current position of the target/obstacle
-    // if the desired one it's not available. it keeps searching in squares
-    // around the original position. Follows a visual representation where X is
-    // the desired position that is not available and ? are the searched places.
-    //
-    //          ???????
-    //    ???   ?     ?
-    //    ?X?   ?  X  ?
-    //    ???   ?     ?
-    //          ???????
-    // It keeps searching expanding that square
-    int x = *old_x;
-    int y = *old_y;
+    for (int index = 1;; index++) { // Expands the search radius indefinitely.
+        int x = *old_x, y = *old_y;
 
-    // Index grows indeterminatelly and determines the size of the square
-    for (int index = 1;; index++) {
-        // Check if there is a free spot on the row over the current position
+
+        // Check the row above.
         y = *old_y - index;
-        for (int x = *old_x - index; x <= *old_x + index; x++) {
+        for (x = *old_x - index; x <= *old_x + index; x++) {
             if (!is_overlapping(y, x, &drone_y, &drone_x)) {
                 *old_y = y;
                 *old_x = x;
@@ -93,9 +71,9 @@ void find_spot(int *old_y, int *old_x, int drone_y, int drone_x) {
             }
         }
 
-        // Check if there is a free spot on the row below the current position
+        // Check the row below.
         y = *old_y + index;
-        for (int x = *old_x - index; x <= *old_x + index; x++) {
+        for (x = *old_x - index; x <= *old_x + index; x++) {
             if (!is_overlapping(y, x, &drone_y, &drone_x)) {
                 *old_y = y;
                 *old_x = x;
@@ -103,10 +81,9 @@ void find_spot(int *old_y, int *old_x, int drone_y, int drone_x) {
             }
         }
 
-        // Check if there is a free spot on the column before the current
-        // position
+        // Check the column to the left.
         x = *old_x - index;
-        for (int y = *old_y - index + 1; y <= *old_y + index - 1; y++) {
+        for (y = *old_y - index + 1; y <= *old_y + index - 1; y++) {
             if (!is_overlapping(y, x, &drone_y, &drone_x)) {
                 *old_y = y;
                 *old_x = x;
@@ -114,10 +91,9 @@ void find_spot(int *old_y, int *old_x, int drone_y, int drone_x) {
             }
         }
 
-        // Check if there is a free spot on the column after the current
-        // position
-        x = *old_x + index;
-        for (int y = *old_y - index + 1; y <= *old_y + index - 1; y++) {
+        // Check the column to the left.
+        x = *old_x - index;
+        for (y = *old_y - index + 1; y <= *old_y + index - 1; y++) {
             if (!is_overlapping(y, x, &drone_y, &drone_x)) {
                 *old_y = y;
                 *old_x = x;
@@ -125,331 +101,321 @@ void find_spot(int *old_y, int *old_x, int drone_y, int drone_x) {
             }
         }
 
-        // If the index is growing too much than it means that there is no more
-        // a free position available
+        // If the index grows too large, assume no valid position is available.
         if (index > 100) {
-            logging("ERROR",
-                    "Unable to find a spot on the screen to print on map");
+            logging("ERROR", "Unable to find a valid position for map display.");
             exit(EXIT_FAILURE);
         }
     }
 }
 
+// Main function
+/*
+ * Entry point for the map display program.
+ * Handles setup, communication with the server, and rendering the simulation.
+ */
 int main(int argc, char *argv[]) {
-    // Macro to handle the watchdog signals
-    HANDLE_WATCHDOG_SIGNALS();
+    HANDLE_WATCHDOG_SIGNALS(); // Initialize watchdog signals for safety.
 
-    int to_server, from_server;
+    int to_server, from_server; // Pipes for inter-process communication.
     if (argc == 3) {
-        sscanf(argv[1], "%d", &to_server);
-        sscanf(argv[2], "%d", &from_server);
+        sscanf(argv[1], "%d", &to_server);     // Read the server's write pipe.
+        sscanf(argv[2], "%d", &from_server);   // Read the server's read pipe.
     } else {
-        printf("Wrong number of arguments in map\n");
+        printf("Invalid number of arguments. Expected 2 pipes.\n");
         getchar();
         exit(1);
     }
 
-    // score variables
-    int score           = 0;
-    int score_increment = 0;
-    // time when the target are spawned
-    time_t start_time;
+    // Score tracking.
+    int score = 0, score_increment = 0;
 
-    // Record the last time the target was hit
-    time_t last_target_reached_time = 0;
+    // Time-related variables.
+    time_t start_time = 0, last_target_reached_time = 0;
 
-    // Named pipe (fifo) to send the pid to the WD
+    // Setup FIFO communication for watchdog.
     Mkfifo(FIFO1_PATH, 0666);
-
-    // Getting the map pid
-    int map_pid = getpid();
+    int fd = Open(FIFO1_PATH, O_WRONLY);
     char map_pid_str[10];
-
-    // Here the pid of the map process is passed to the WD
-    sprintf(map_pid_str, "%d", map_pid);
-
-    // Writing to the fifo the previously formatted string
-    int fd;
-    fd = Open(FIFO1_PATH, O_WRONLY);
+    sprintf(map_pid_str, "%d", getpid());
     Write(fd, map_pid_str, strlen(map_pid_str) + 1);
     Close(fd);
-
-    // Setting up the struct in which to store the position of the drone
-    // in order to calculate the current position on the screen of the drone
-    struct pos drone_pos = {0,0};
-
-    // Arrays managed as stacks where to save the position of targets and
-    // obstacles
+    // Drone position and other entities.
+    struct pos drone_pos = {0, 0};
     struct pos targets_pos[N_TARGETS];
-    int target_num = 0;
     struct pos obstacles_pos[N_OBSTACLES];
-    int obstacles_num = 0;
+    int target_num = 0, obstacles_num = 0;
 
-    // Setting up ncurses
+// Setup ncurses for GUI rendering.
     initscr();
-    // Disabling line buffering
-    cbreak();
-    // Hide the cursor in order to not see the white carret on the screen
-    curs_set(0);
-    // Display the drone, obstacles and targets in color
-    start_color();
+    cbreak();  // Disable line buffering.
+    curs_set(0); // Hide the cursor.
+    start_color(); // Enable colors.
     use_default_colors();
-    // The use of use_default_colors comes into play here where the color of the
-    // background is set to -1 meaning that it becomes the current terminal
-    // background color
-    init_pair(1, COLOR_BLUE, -1);
-    init_pair(2, COLOR_RED, -1);
-    init_pair(3, COLOR_GREEN, -1);
-    // Displaying the first intance of the window
+    init_pair(1, COLOR_BLUE, -1); // Drone color.
+    init_pair(2, COLOR_RED, -1);  // Obstacle color.
+    init_pair(3, COLOR_GREEN, -1); // Target color.
 
-    WINDOW *map_window =
-        create_map_win(getmaxy(stdscr) - 2, getmaxx(stdscr), 1, 0);
+// Create the map window.
+    WINDOW *map_window = create_map_win(getmaxy(stdscr) - 2, getmaxx(stdscr), 1, 0);
 
-    // Array where to save received strings
-    char received[MAX_MSG_LEN];
+        char received[MAX_MSG_LEN]; // Buffer for incoming messages.
+        fd_set master, reader;
+        struct timeval select_timeout = {5, 0}; // Timeout for the select() syscall.
 
-    // Setting up structs for select
-    struct timeval select_timeout;
-    // Setting a sleep time of 5 seconds in case no update is needed
-    select_timeout.tv_sec  = 5;
-    select_timeout.tv_usec = 0;
-    fd_set reader, master;
-    FD_ZERO(&reader);
-    FD_ZERO(&master);
-    FD_SET(from_server, &master);
+        FD_ZERO(&master);
+        FD_SET(from_server, &master);
+    // Monitor for incoming data.
+    
     while (1) {
         // resetting the fd_set
         reader = master;
         int ret;
         do {
-            // Note that no signal is ignored here because the signal that would
-            // be sent to this process is SIG_WINCH that is also a signal that
-            // has its own handler defined in ncurses. If here we would have set
-            // sig_ign of sig_winch and then after the select restored with
-            // sig_dfl then the resizing of the window would not have worked
-            // anymore and the gui would have kept its original size
+            // Signals like SIGWINCH (used by ncurses for window resizing) are not ignored 
+            // to ensure proper handling. Ignoring or resetting them would prevent the GUI 
+            // from resizing correctly.
             ret = Select(from_server + 1, &reader, NULL, NULL, &select_timeout);
 
-            // The only reason to get an erorr is if Select gets interrupted by
-            // a signal. In that case the function should be restarted if the
-            // SA_RESTART flag didn't do its job
+            // Restart Select if interrupted by a signal and SA_RESTART didn't handle it.
+
         } while (ret == -1);
         // Resetting the timeout
         select_timeout.tv_sec  = 5;
         select_timeout.tv_usec = 0;
 
+
         if (FD_ISSET(from_server, &reader)) {
             int read_ret = Read(from_server, received, MAX_MSG_LEN);
-            // Check if any pipe needs to be closed
+
+            // If the pipe is closed, handle cleanup and log the event
             if (read_ret == 0) {
                 Close(from_server);
                 FD_CLR(from_server, &master);
-                logging("WARN", "Pipe to map closed");
+                logging("WARN", "Connection to map process lost. Pipe closed.");
             } else {
                 char aux[100];
-                // If STOP then this needs to be closed
+                
+                // If "STOP" command is received, exit the loop  
                 if (!strcmp(received, "STOP")) {
                     break;
                 }
                 switch (received[0]) {
-                    case 'D':
-                        // D indicates the drone position
+              case 'D':
+                        // 'D' indicates a drone position update
                         sscanf(received, "D%f|%f", &drone_pos.x, &drone_pos.y);
                         break;
                     case 'O':
-                        // O indicates that new obstacles are available
-                        logging("INFO", "vvvvvvvvvvvOBSTACLESvvvvvvvvvvvvvvv");
+                        // 'O' signals the arrival of new obstacle data
+                        logging("INFO", "Processing new obstacle data...");
                         tokenization(obstacles_pos, received, &obstacles_num);
-                        logging("INFO", "^^^^^^^^^^^OBSTACLES^^^^^^^^^^^^^^^");
-                        sprintf(aux, "Obtacles %d", obstacles_num);
+                        sprintf(aux, "Total obstacles updated: %d", obstacles_num);
                         logging("INFO", aux);
                         break;
                     case 'T':
-                        // T means that new targets are available
-                        logging("INFO", "vvvvvvvvvvvTARGETSvvvvvvvvvvvvvvv");
+                        // 'T' signals the arrival of new target data
+                        logging("INFO", "Processing new target data...");
                         tokenization(targets_pos, received, &target_num);
-                        logging("INFO", "^^^^^^^^^^^TARGETS^^^^^^^^^^^^^^^");
-                        sprintf(aux, "Targets %d", target_num);
+                        sprintf(aux, "Total targets updated: %d", target_num);
                         logging("INFO", aux);
-                        start_time = time(NULL);
+                        start_time = time(NULL); // Update target spawn time
                         break;
                 }
             }
         }
 
-        // Display the menu text
+        // Refresh the screen to update the display
         refresh();
 
-        // Displaying the title of the window.
+        // Display the window title
         mvprintw(0, 0, "MAP DISPLAY");
 
-        // Fitting the region of the display when the window is resized
-        int max_x = COLS; 
+        // Clear any extra characters when resizing the window
+        int max_x = COLS;  
         for (int x = 11; x < max_x; x++) {
-            mvaddch(0, x, ' '); 
+            mvaddch(0, x, ' ');
         }
 
+        // Display the current score and event messages
         if (score_increment > 0) {
-            attron(COLOR_PAIR(3));
-            mvprintw(0, COLS / 5, "Score: %d | %s %d points", score, event_reason, score_increment);
+            attron(COLOR_PAIR(3));  // Green for positive score
+            mvprintw(0, COLS / 5, "Score: %d | %s +%d points", score, event_reason, score_increment);
             attroff(COLOR_PAIR(3));
         } else if (score_increment < 0) {
-            attron(COLOR_PAIR(2));
-            mvprintw(0, COLS / 5, "Score: %d | %s %d point", score, event_reason, - score_increment);
-            attroff(COLOR_PAIR(1));
-        } else
+            attron(COLOR_PAIR(2));  // Red for negative score
+            mvprintw(0, COLS / 5, "Score: %d | %s -%d points", score, event_reason, -score_increment);
+            attroff(COLOR_PAIR(2));  
+        } else {
             mvprintw(0, COLS / 5, "Start playing the game!");
+        }
+
+        // Refresh to apply the score updates
         refresh();
 
-        // Deleting the old window that is encapsulating the map in order to
-        // create the animation, and to allow the resizing of the window in case
-        // of terminal resize
-        delwin(map_window);
-        // Redrawing the window. This is useful if the screen is resized
+        // Recreate the map window to handle resizing and animations
+        delwin(map_window);  
         map_window = create_map_win(LINES - 1, COLS, 1, 0);
 
-        // In order to correctly handle the drone position calculation all
-        // the simulations are done in a 500x500 square. Then the position of
-        // the drone is converted to the dimension of the window by doing a
-        // proportion. The computation done in the following line could by
-        // expressed as the following in the x axis:
-        // drone_position_in_terminal = simulated_drone_pos_x * term_width/500
-        // Now for the terminal width and height it needs to be taken into
-        // consideration the border of the window itself. Considering for
-        // example the x axis we have a border on the left and one on the right
-        // so we need to subtract 2 from the width of the main_window. Now the
-        // extra -1 is due to the fact that the index starts from 0 and not
-        // from 1. With this we mean that if we have an array of dimension 3.
-        // The highest index of an element in the arry will be 2, not 3. This
-        // explains why -3 instead of -2.
-        int drone_x = round(1 + drone_pos.x * (getmaxx(map_window) - 3) /
-                                    SIMULATION_WIDTH);
-        int drone_y = round(1 + drone_pos.y * (getmaxy(map_window) - 3) /
-                                    SIMULATION_HEIGHT);
+
+        // Convert the drone's simulated position (500x500 grid) to the terminal window scale.
+        // The mapping maintains proportionality between simulation and display dimensions.
+        //
+        // Adjustments:
+        // - The window has borders, so we subtract 2 from width/height.
+        // - An extra -1 ensures the correct index range, as array indices start at 0.
+        //
+        // Formula: 
+        // drone_position_in_terminal = (simulated_drone_position * (window_size - border_offset)) / SIMULATION_SIZE
+
+        int drone_x = round(1 + drone_pos.x * (getmaxx(map_window) - 3) / SIMULATION_WIDTH);
+        int drone_y = round(1 + drone_pos.y * (getmaxy(map_window) - 3) / SIMULATION_HEIGHT);
+
 
         int target_x, target_y;
         bool to_decrease = false;
+
         // Get the current time
         time_t current_time = time(NULL);
-        // Record the last time the score was decreased
+        
+        // Last time the score was decreased
         static time_t last_score_decrease_time = 0;
 
         char to_send[MAX_MSG_LEN];
-        // Activate color for the targets
+
+        // Activate color for displaying targets
         wattron(map_window, COLOR_PAIR(3));
+
         for (int i = 0; i < target_num; i++) {
-            // Here the targets are displayed in the window by resizing from the
-            // simulation window.
-            target_x = round(1 + targets_pos[i].x * (getmaxx(map_window) - 3) /
-                                     SIMULATION_WIDTH);
-            target_y = round(1 + targets_pos[i].y * (getmaxy(map_window) - 3) /
-                                     SIMULATION_HEIGHT);
-            // It's verified that no target overlaps with any of the previously
-            // set
-            if (is_overlapping(target_y, target_x, NULL, NULL))
+            // Convert target's simulated position to fit terminal window dimensions
+            target_x = round(1 + targets_pos[i].x * (getmaxx(map_window) - 3) / SIMULATION_WIDTH);
+            target_y = round(1 + targets_pos[i].y * (getmaxy(map_window) - 3) / SIMULATION_HEIGHT);
+
+            // Ensure no overlap with other objects
+            if (is_overlapping(target_y, target_x, NULL, NULL)) {
                 find_spot(&target_y, &target_x, drone_y, drone_x);
-            // if we touch the wall, the score decreases by 1.
-            // The score will not decrease for 3 seconds after hitting a wall
-            // once.
-            if (drone_pos.y < 1 || drone_pos.y > SIMULATION_HEIGHT - 1 || drone_pos.x < 1 ||
-                drone_pos.x > SIMULATION_WIDTH - 1) {
+            }
+
+            // --- Wall Collision Logic ---
+            // If the drone moves outside simulation boundaries, decrease score
+            if (drone_pos.y < 1 || drone_pos.y > SIMULATION_HEIGHT - 1 || 
+                drone_pos.x < 1 || drone_pos.x > SIMULATION_WIDTH - 1) {
+                
+                // Only decrease score if 10 seconds have passed since game start
                 if (difftime(current_time, start_time) > 10) {
+                    
+                    // Prevent frequent deductions—only decrease score once every 3 seconds
                     if (difftime(current_time, last_score_decrease_time) > 3) {
                         score_increment = -1;
-                        score = score + score_increment;
-                        // score -= 1;
+                        score += score_increment;
                         last_score_decrease_time = current_time;
-                        snprintf(event_reason, sizeof(event_reason), "You hit the wall! You lost");
+
+                        // Update event log message
+                        snprintf(event_reason, sizeof(event_reason), "You hit the wall! You lost points.");
                     }
                 }
             }
+            // Check if the drone has reached the target
             if (target_x == drone_x && target_y == drone_y) {
+                // Calculate time taken to reach the target
                 time_t impact_time = current_time - last_target_reached_time;
-                mvprintw(0, 4*COLS / 5, "%ld", (long)impact_time);
+                mvprintw(0, 4 * COLS / 5, "%ld", (long)impact_time);
 
-                // If a target is reached in the first 20 seconds, the score
-                // increases of 20 - the number of seconds taken to reach it.
-                // For example, if a target is reached in 5 or more seconds, but
-                // less than 6, the score increases by 20-5=15. In general, the
-                // score increases of:
-                //- 20 - (integer part of impact_time), if impact_time < 20
-                //- 1, if impact_time >= 20
-                if (impact_time < 200.0) //&& i == 0)
-                    score_increment = 4 + 200 - (int)ceil(impact_time);
-                // If we reached the target 1, the score increases by 2.
+                // --- Scoring Logic ---
+                // If the target 1 is reached within 20 seconds:
+                // Score increases based on the formula: 20 - time taken
+                // Otherwise, it gives a minimal point increase.
+                if (impact_time < 20)// && i == 0) {
+                    score_increment = 4 + (20 - (int)ceil(impact_time));
                 if (i == 0) {
-                    score_increment = 4;
+                    score_increment = 4;     // Target 1 gives 4 points
+
                 } else
-                    score_increment = 2;
-                score = score + score_increment;
+                    score_increment = 2;    // Other targets give 2 points.
+
+                // Update score and last target hit time
+                score += score_increment;
                 last_target_reached_time = time(NULL);
-                snprintf(event_reason, sizeof(event_reason), "You reached the target %d! You got", i + 1);
+
+                // Event message on the screen
+                snprintf(event_reason, sizeof(event_reason), "You reached target %d! You got", i + 1);
                 
-                // If the target position is the same as the drone then we have
-                // a hit
-                sprintf(to_send, "TH|%d|%.3f,%.3f", i, targets_pos[i].x,
-                        targets_pos[i].y);
-                // The target is then removed from the array
+                // Notify server of target hit
+                sprintf(to_send, "TH|%d|%.3f,%.3f", i, targets_pos[i].x, targets_pos[i].y);
                 remove_target(i, targets_pos, target_num);
                 Write(to_server, to_send, MAX_MSG_LEN);
+
+                // Mark that a target was removed
                 to_decrease = true;
             } else {
-                // If no target has been hit then add it to this array that aims
-                // to simplify the checking for callisions
+                // Store target position for collision checking
                 target_obstacles_screen_position[++tosp_top][0] = target_y;
                 target_obstacles_screen_position[tosp_top][1]   = target_x;
-                // And print the target on screen
+
+                // Render the target on the map
                 mvwprintw(map_window, target_y, target_x, "%d", i + 1);
             }
         }
+
+        // Disable target color after rendering
         wattroff(map_window, COLOR_PAIR(3));
-        // Check whether all the targets have been hit
+
+        // Check if any targets were hit
         if (to_decrease) {
-            if (!--target_num)
-                // And in that case Write to the server that we need new targets
+            // If all targets have been hit, request new ones from the server
+            if (--target_num == 0) {
                 Write(to_server, "GE", MAX_MSG_LEN);
+            }
         }
 
         int obst_x, obst_y;
-        // Boolean to indicate if the drone can be displayed or is corrently
-        // under an obstacle. Note that since the simulation window is 500x500
-        // the display on the terminal is resized and much resolution is lost.
-        // Because of this ever if in the terminal the two seem overlapping this
-        // DOES NOT mean that are really overlapping. It's just a visual thing.
-        // We decided that changing values to avoid this issue is not worth it
-        // because someone could use the terminal in a very small window and
-        // still have this problem.
-        bool can_display_drone = true;
+
+        // Boolean flag to determine if the drone should be displayed or if it appears 
+        // to be overlapping an obstacle. Due to the simulation's 500x500 resolution 
+        // being scaled down for the terminal window, visual overlaps may occur. 
+        // However, this does not mean the drone is actually colliding with obstacles 
+        // in the simulation. 
+        //
+        // Adjusting obstacle positions to avoid this issue is not ideal, as users 
+        // may resize the terminal to a small window, causing the same visual effect.
+        bool can_display_drone = true;  
+
         wattron(map_window, COLOR_PAIR(2));
         for (int i = 0; i < obstacles_num; i++) {
-            obst_x = round(1 + obstacles_pos[i].x * (getmaxx(map_window) - 3) /
-                                   SIMULATION_WIDTH);
-            obst_y = round(1 + obstacles_pos[i].y * (getmaxy(map_window) - 3) /
-                                   SIMULATION_HEIGHT);
-            // Checking for overlapping with previous targets, obstecles and in
-            // this case also with the drone
-            if (is_overlapping(obst_y, obst_x, &drone_y, &drone_x))
-                find_spot(&obst_y, &obst_x, drone_y, drone_x);
-            target_obstacles_screen_position[++tosp_top][0] = obst_y;
-            target_obstacles_screen_position[tosp_top][1]   = obst_x;
-            mvwprintw(map_window, obst_y, obst_x, "O");
+            // Convert obstacle position from simulation space (500x500) to terminal coordinates.
+            obst_x = round(1 + obstacles_pos[i].x * (getmaxx(map_window) - 3) / SIMULATION_WIDTH);
+            obst_y = round(1 + obstacles_pos[i].y * (getmaxy(map_window) - 3) / SIMULATION_HEIGHT);
 
-            // If the drone is overlapped to an obstacle than it cannot be
-            // displayed
-            if (obst_y == drone_y && obst_x == drone_x)
-                can_display_drone = false;
+        // Check for overlap with existing targets, obstacles, or the drone itself.
+        if (is_overlapping(obst_y, obst_x, &drone_y, &drone_x)) {
+            find_spot(&obst_y, &obst_x, drone_y, drone_x); // Find an alternative position.
         }
-        wattroff(map_window, COLOR_PAIR(2));
 
-        // The drone is now displayed on the screen
+        // Store the obstacle position for future collision checks.
+        target_obstacles_screen_position[++tosp_top][0] = obst_y;
+        target_obstacles_screen_position[tosp_top][1]   = obst_x;
+
+        // Render the obstacle on the map.
+        mvwprintw(map_window, obst_y, obst_x, "O");
+
+        // If the drone's position matches an obstacle, prevent it from being displayed.
+        if (obst_y == drone_y && obst_x == drone_x) {
+            can_display_drone = false;
+        }
+        }
+
+        wattroff(map_window, COLOR_PAIR(2)); // Disable obstacle color rendering.
+
+        // Render the drone if it is not visually overlapping an obstacle.
         if (can_display_drone) {
             wattron(map_window, COLOR_PAIR(1));
             mvwprintw(map_window, drone_y, drone_x, "+");
             wattroff(map_window, COLOR_PAIR(1));
         }
-        // The map_window is refreshed
+
+        // Refresh the map window to reflect updated positions.
         wrefresh(map_window);
-        tosp_top = -1;
+        tosp_top = -1; // Reset the top index for tracking positions.
+
     }
 
     /// Clean up
