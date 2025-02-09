@@ -92,14 +92,6 @@ int main() {
     }
     time_t timestamp = time(NULL);
 
-    ObstacleMessage message;
-    for (int i = 0; i < N_OBSTACLES; i++) {
-        message.obstacle_x[i] = random() % SIMULATION_WIDTH;
-        message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
-    }
-    time_t timestamp = time(NULL);
-
-
     while (true) {
         if (!PUBLISHERS_SLEEP_MODE) {
             if (difftime(time(NULL), timestamp) > OBSTACLES_SPAWN_PERIOD) {
@@ -109,16 +101,7 @@ int main() {
                     message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
                 }
                 logging("INFO",
-                        "Obstacle process generated a new set of obstacles");
-            if (difftime(time(NULL), timestamp) > OBSTACLES_SPAWN_PERIOD) {
-                timestamp = time(NULL);
-                for (int i = 0; i < N_OBSTACLES; i++) {
-                    message.obstacle_x[i] = random() % SIMULATION_WIDTH;
-                    message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
-                }
-                logging("INFO",
-                        "Obstacle process generated a new set of obstacles");
-            }
+                        "Obstacle process generated a new set of obstacles");}
             publisher.publish(message);
 
             sleep(500);
