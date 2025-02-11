@@ -13,8 +13,8 @@
 extern "C" {
 #endif
 #include "constants.h"
-// #include "wrappers/wrappers.h"
-// #include "utility/utility.h"
+#include "include/wrappers/wrappers.h"
+#include "include/utility/utility.h"
 #ifdef __cplusplus
 }
 #endif
@@ -49,8 +49,8 @@ class TargetPublisher {
             return false;
 
         TopicQos tqos;
-        topic_ =
-            participant_->create_topic("target", type_.get_type_name(), tqos);
+        topic_ = participant_->create_topic(TOPIC_NAME_TARGET,
+                                            type_.get_type_name(), tqos);
         if (!topic_)
             return false;
 
@@ -92,6 +92,18 @@ void signal_handler(int signo, siginfo_t *info, void *context) {
     }
 }
 
+// Function to write log messages in the logfile
+void logging(const char *type, const char *message) {
+    FILE *F;
+    F = fopen(LOGFILE_PATH, "a");
+    // Locking the logfile
+    flock(fileno(F), LOCK_EX);
+    fprintf(F, "[%s] - %s\n", type, message);
+    // Unlocking the file so that the server can access it again
+    flock(fileno(F), LOCK_UN);
+    fclose(F);
+}
+
 int main() {
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
@@ -116,8 +128,8 @@ int main() {
             message.target_y[i] = random() % SIMULATION_HEIGHT;
         }
         publisher.publish(message);
-        // logging("INFO", "Target process generated a new set of targets");
-        sleep(1); // Adjust as needed to control publish rate
+        logging("INFO", "Target process generated a new set of targets");
+        sleep(20); // Adjust as needed to control publish rate
     }
 
     return 0;
