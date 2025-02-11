@@ -1,0 +1,5 @@
+struct Obstacle
+{
+    double obstacle_x[10];
+    double obstacle_y[10];
+};

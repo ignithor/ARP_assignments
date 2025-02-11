@@ -14,7 +14,7 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     /usr/local/include/fastdds
     /usr/local/include/fastcdr
-    ${CMAKE_SOURCE_DIR}/../include/Generated
+    ${CMAKE_SOURCE_DIR}/include
 )
 
 # Define source files
@@ -22,6 +22,12 @@ set(SOURCE_TARGET_FILES
     target.cpp
     ${CMAKE_SOURCE_DIR}/include/Generated/TargetTypeObjectSupport.cxx
     ${CMAKE_SOURCE_DIR}/include/Generated/TargetPubSubTypes.cxx
+)
+
+set(SOURCE_OBSTACLE_FILES 
+    obstacle.cpp
+    ${CMAKE_SOURCE_DIR}/include/Generated/ObstacleTypeObjectSupport.cxx
+    ${CMAKE_SOURCE_DIR}/include/Generated/ObstaclePubSubTypes.cxx
 )
 
 # Adding executables with relative files
@@ -32,7 +38,7 @@ add_executable(map map.c)
 add_executable(watchdog watchdog.c)
 add_executable(input input.c)
 add_executable(target ${SOURCE_TARGET_FILES})
-add_executable(obstacle obstacle.c)
+add_executable(obstacle ${SOURCE_OBSTACLE_FILES})
 
 # Adding the required libraries for the executables
 target_link_libraries(master wrappers constants)
@@ -42,4 +48,4 @@ target_link_libraries(map wrappers constants m utility ${CURSES_LIBRARIES})
 target_link_libraries(watchdog wrappers constants utility)
 target_link_libraries(input wrappers constants dronedatastructs utility m ${CURSES_LIBRARIES})
 target_link_libraries(target wrappers constants utility stdc++ fastcdr fastdds)
-target_link_libraries(obstacle wrappers constants utility)
+target_link_libraries(obstacle wrappers constants utility stdc++ fastcdr fastdds)

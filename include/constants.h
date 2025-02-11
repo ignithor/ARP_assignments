@@ -24,6 +24,9 @@
 
 #define OBSTACLES_SPAWN_PERIOD 20
 
+#define TOPIC_NAME_OBSTACLE "obstacle"
+#define TOPIC_NAME_TARGET "target"
+
 // Defining the amount to sleep between any two consequent signals to the
 // processes
 #define WD_SLEEP_PERIOD 1
