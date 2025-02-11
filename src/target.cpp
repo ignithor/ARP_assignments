@@ -122,15 +122,18 @@ int main() {
     srandom((unsigned int)time(NULL));
 
     while (true) {
-        TargetMessage message;
-        for (int i = 0; i < N_TARGETS; i++) {
-            message.target_x[i] = random() % SIMULATION_WIDTH;
-            message.target_y[i] = random() % SIMULATION_HEIGHT;
+        if (!PUBLISHERS_SLEEP_MODE){
+            TargetMessage message;
+            for (int i = 0; i < N_TARGETS; i++) {
+                message.target_x[i] = random() % SIMULATION_WIDTH;
+                message.target_y[i] = random() % SIMULATION_HEIGHT;
+            }
+            publisher.publish(message);
+            logging("INFO", "Target process generated a new set of targets");
+            sleep(20); // Adjust as needed to control publish rate
         }
-        publisher.publish(message);
-        logging("INFO", "Target process generated a new set of targets");
-        sleep(20); // Adjust as needed to control publish rate
-    }
+        }
+
 
     return 0;
 }

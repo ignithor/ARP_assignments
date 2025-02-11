@@ -122,16 +122,19 @@ int main() {
     srandom((unsigned int)time(NULL));
 
     while (true) {
-        ObstacleMessage message;
-        for (int i = 0; i < N_TARGETS; i++) {
-            message.obstacle_x[i] = random() % SIMULATION_WIDTH;
-            message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
-        }
-        publisher.publish(message);
-        logging("INFO", "Obstacle process generated a new set of obstacles");
-        sleep(
-            OBSTACLES_SPAWN_PERIOD); // Adjust as needed to control publish rate
-    }
+        if (!PUBLISHERS_SLEEP_MODE) {
+
+            ObstacleMessage message;
+            for (int i = 0; i < N_TARGETS; i++) {
+                message.obstacle_x[i] = random() % SIMULATION_WIDTH;
+                message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
+            }
+            publisher.publish(message);
+            logging("INFO",
+                    "Obstacle process generated a new set of obstacles");
+            sleep(OBSTACLES_SPAWN_PERIOD); // Adjust as needed to control
+                                           // publish rate
+        }}
 
     return 0;
 }
