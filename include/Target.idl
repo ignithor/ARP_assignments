@@ -1,0 +1,5 @@
+struct Target
+{
+    double target_x[9];
+    double target_y[9];
+};

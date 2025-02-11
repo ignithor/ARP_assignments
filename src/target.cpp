@@ -1,3 +1,6 @@
+#include "include/Generated/TargetPubSubTypes.hpp"
+#include <csignal>
+#include <ctime>
 #include <fastdds/dds/domain/DomainParticipant.hpp>
 #include <fastdds/dds/domain/DomainParticipantFactory.hpp>
 #include <fastdds/dds/publisher/DataWriter.hpp>
@@ -10,16 +13,86 @@
 extern "C" {
 #endif
 #include "constants.h"
+// #include "wrappers/wrappers.h"
 // #include "utility/utility.h"
-#include "wrappers/wrappers.h"
-#include <time.h>
-
 #ifdef __cplusplus
 }
 #endif
 
-int main(int argc, char *argv[]) {
+using namespace eprosima::fastdds::dds;
 
+struct TargetMessage {
+    double target_x[N_TARGETS];
+    double target_y[N_TARGETS];
+};
+
+class TargetPublisher {
+  public:
+    TargetPublisher()
+        : participant_(nullptr), publisher_(nullptr), topic_(nullptr),
+
+          writer_(nullptr), type_(new TargetPubSubType()) {}
+
+    bool init() {
+        DomainParticipantQos pqos;
+        participant_ =
+            DomainParticipantFactory::get_instance()->create_participant(0,
+                                                                         pqos);
+        if (!participant_)
+            return false;
+
+        type_.register_type(participant_);
+
+        PublisherQos pub_qos;
+        publisher_ = participant_->create_publisher(pub_qos, nullptr);
+        if (!publisher_)
+            return false;
+
+        TopicQos tqos;
+        topic_ =
+            participant_->create_topic("target", type_.get_type_name(), tqos);
+        if (!topic_)
+            return false;
+
+        DataWriterQos wqos;
+        writer_ = publisher_->create_datawriter(topic_, wqos, nullptr);
+        return writer_ != nullptr;
+    }
+
+    void publish(const TargetMessage &message) { writer_->write(&message); }
+
+    ~TargetPublisher() {
+        if (writer_)
+            publisher_->delete_datawriter(writer_);
+        if (topic_)
+            participant_->delete_topic(topic_);
+        if (publisher_)
+            participant_->delete_publisher(publisher_);
+        if (participant_)
+            DomainParticipantFactory::get_instance()->delete_participant(
+                participant_);
+    }
+
+  private:
+    DomainParticipant *participant_;
+    Publisher *publisher_;
+    Topic *topic_;
+    DataWriter *writer_;
+    TypeSupport type_;
+};
+
+void signal_handler(int signo, siginfo_t *info, void *context) {
+    pid_t WD_pid = -1;
+    // Specifying that context is unused
+    (void)(context);
+
+    if (signo == SIGUSR1) {
+        WD_pid = info->si_pid;
+        kill(WD_pid, SIGUSR2);
+    }
+}
+
+int main() {
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_sigaction = signal_handler;
@@ -27,66 +100,25 @@ int main(int argc, char *argv[]) {
     sa.sa_flags = SA_SIGINFO | SA_RESTART;
     sigaction(SIGUSR1, &sa, NULL);
 
-    // Specifying that argc and argv are unused variables
-    int to_server_pipe, from_server_pipe;
-
-    if (argc == 3) {
-        sscanf(argv[1], "%d", &to_server_pipe);
-        sscanf(argv[2], "%d", &from_server_pipe);
-    } else {
-        printf("Wrong number of arguments in target\n");
-        getchar();
-        exit(1);
+    TargetPublisher publisher;
+    if (!publisher.init()) {
+        std::cerr << "Failed to initialize Fast DDS publisher" << std::endl;
+        return 1;
     }
 
-    // coordinates of target
-    float target_x, target_y;
-    // string for the communication with server
-    char to_send[MAX_MSG_LEN] = "T";
-    // String to compose the message for the server
-    char aux_to_send[MAX_MSG_LEN] = {0};
-
-    // seeding the random nymber generator with the current time, so that it
-    // starts with a different state every time the programs is executed
+    // Seeding the random number generator
     srandom((unsigned int)time(NULL));
 
-    char received[MAX_MSG_LEN];
-
-    while (1) {
-        // Resetting to_send string
-        sprintf(to_send, "T");
-        // spawn random coordinates in map field range and send it to the
-        // server, so that they can be spawned in the map
-        sprintf(aux_to_send, "[%d]", N_TARGETS);
-        strcat(to_send, aux_to_send);
+    while (true) {
+        TargetMessage message;
         for (int i = 0; i < N_TARGETS; i++) {
-            if (i != 0) {
-                strcat(to_send, "|");
-            }
-            // Targets need to be inside the simulation window
-            target_x = random() % SIMULATION_WIDTH;
-            target_y = random() % SIMULATION_HEIGHT;
-            sprintf(aux_to_send, "%.3f,%.3f", target_x, target_y);
-            strcat(to_send, aux_to_send);
+            message.target_x[i] = random() % SIMULATION_WIDTH;
+            message.target_y[i] = random() % SIMULATION_HEIGHT;
         }
-
-        // Send new targets to server
-        Write(to_server_pipe, to_send, MAX_MSG_LEN);
-
-        // Here Read is used instead of Select because it has to be blocking
-        // untill the server sends a new GE
-        Read(from_server_pipe, received, MAX_MSG_LEN);
-        if (!strcmp(received, "GE")) {
-            logging("INFO", "Received GE");
-        } else if (!strcmp(received, "STOP")) {
-            // Otherwise if it's STOP close everything
-            break;
-        }
-        // Log if new targets have been produced
-        logging("INFO", "Target process generated a new set of targets");
+        publisher.publish(message);
+        // logging("INFO", "Target process generated a new set of targets");
+        sleep(1); // Adjust as needed to control publish rate
     }
 
-    // Cleaning up
-    Close(to_server_pipe);
     return 0;
 }

@@ -14,17 +14,24 @@ include_directories(
     ${CMAKE_SOURCE_DIR}
     /usr/local/include/fastdds
     /usr/local/include/fastcdr
-    ${CMAKE_SOURCE_DIR}/Generated
+    ${CMAKE_SOURCE_DIR}/../include/Generated
 )
 
-# Adding executables with realative files
+# Define source files
+set(SOURCE_TARGET_FILES 
+    target.cpp
+    ${CMAKE_SOURCE_DIR}/include/Generated/TargetTypeObjectSupport.cxx
+    ${CMAKE_SOURCE_DIR}/include/Generated/TargetPubSubTypes.cxx
+)
+
+# Adding executables with relative files
 add_executable(master master.c)
 add_executable(server server.c)
 add_executable(drone drone.c)
 add_executable(map map.c)
 add_executable(watchdog watchdog.c)
 add_executable(input input.c)
-add_executable(target target.cpp)
+add_executable(target ${SOURCE_TARGET_FILES})
 add_executable(obstacle obstacle.c)
 
 # Adding the required libraries for the executables
