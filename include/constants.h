@@ -15,12 +15,15 @@
 #define MAX_MSG_LEN 1024
 
 #define N_TARGETS 9
-#define N_OBSTACLES 20
+#define N_OBSTACLES 10
 
 // Maximum combined force from the obstacles
 #define MAX_OBST_FORCES 1000
 // Maximum combined force from the targets
-#define MAX_TARG_FORCES 1000
+#define MAX_TARG_FORCES 2000
+
+#define INIT_POSE_X 200
+#define INIT_POSE_Y 200
 
 #define OBSTACLES_SPAWN_PERIOD 20
 
