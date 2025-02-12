@@ -1,10 +1,12 @@
 #include "constants.h"
 #include "wrappers/wrappers.h"
 
-// Function to spawn the processes
-static void spawn(char **arg_list) {
-    Execvp(arg_list[0], arg_list);
-    exit(EXIT_FAILURE);
+// Function to spawn a new process and execute a command
+static void spawn(char **exec_args) {
+    if (Execvp(exec_args[0], exec_args) == -1) {
+        perror("Error executing command");
+        exit(EXIT_FAILURE);
+    }
 }
 
 int main(int argc, char *argv[]) {
@@ -30,10 +32,10 @@ int main(int argc, char *argv[]) {
     strcpy(process_names[5], "./obstacle");
     strcpy(process_names[6], "./watchdog");
 
-    // Pids for all children
-    pid_t child[NUM_PROCESSES];
+    // Array to store child process PIDs
+    pid_t child_pids[NUM_PROCESSES];
 
-    // String to contain all che children pids (except WD)
+    // Array to store child PIDs as strings (excluding WD)
     char child_pids_str[NUM_PROCESSES - 1][80];
 
     // Arrays to contain the pids
@@ -60,7 +62,7 @@ int main(int argc, char *argv[]) {
     Pipe(obstacle_server);
     Pipe(server_obstacle);
 
-    // strings to pass pipe values as args
+    // Strings to pass pipe values as arguments
     char drone_server_str[10];
     char server_drone_str[10];
     char server_input_str[10];
@@ -73,8 +75,8 @@ int main(int argc, char *argv[]) {
     char server_obstacle_str[10];
 
     for (int i = 0; i < NUM_PROCESSES; i++) {
-        child[i] = Fork();
-        if (!child[i]) {
+        child_pids[i] = Fork();
+        if (!child_pids[i]) {
 
             // Spawn the input and map process using konsole
             char *exec_args[]        = {process_names[i],
@@ -135,8 +137,9 @@ int main(int argc, char *argv[]) {
                     // Spawn the server process
                     spawn(exec_args);
                     break;
+
                 case 1:
-                    // Drone
+                    // **Drone Process Setup**
                     sprintf(server_drone_str, "%d", server_drone[0]);
                     sprintf(drone_server_str, "%d", drone_server[1]);
 
@@ -165,12 +168,18 @@ int main(int argc, char *argv[]) {
                     Close(obstacle_server[1]);
                     Close(server_obstacle[0]);
                     Close(server_obstacle[1]);
-                    spawn(arg_list);
+
+                    // Spawn the drone process
+                    spawn(exec_args);
                     break;
+
                 case 2:
-                    // Input
+                    // **Input Process Setup**
+                    // Convert pipe descriptors to strings for argument passing
                     sprintf(input_server_str, "%d", input_server[1]);
                     sprintf(server_input_str, "%d", server_input[0]);
+
+                    // Assign pipe arguments for the input process
                     konsole_arg_list[3] = input_server_str;
                     konsole_arg_list[4] = server_input_str;
 
@@ -196,10 +205,14 @@ int main(int argc, char *argv[]) {
                     Execvp("konsole", konsole_arg_list);
                     exit(EXIT_FAILURE);
                     break;
+
                 case 3:
-                    // Map
+                    // **Map Process Setup**
+                    // Convert pipe descriptors to strings for argument passing
                     sprintf(map_server_str, "%d", map_server[1]);
                     sprintf(server_map_str, "%d", server_map[0]);
+
+                    // Assign pipe arguments for the map process
                     konsole_arg_list[3] = map_server_str;
                     konsole_arg_list[4] = server_map_str;
 
@@ -223,7 +236,8 @@ int main(int argc, char *argv[]) {
                     break;
 
                 case 4:
-                    // Target
+                    // **Target Process Setup**
+                    // Convert pipe descriptors to strings for argument passing
                     sprintf(target_server_str, "%d", target_server[1]);
                     sprintf(server_target_str, "%d", server_target[0]);
 
@@ -242,10 +256,13 @@ int main(int argc, char *argv[]) {
                     Close(server_obstacle[0]);
                     Close(server_obstacle[1]);
 
-                    spawn(arg_list);
+                    // Spawn the target process
+                    spawn(exec_args);
                     break;
+
                 case 5:
-                    // Obstacle
+                    // **Obstacle Process Setup**
+                    // Convert pipe descriptors to strings for argument passing
                     sprintf(obstacle_server_str, "%d", obstacle_server[1]);
                     sprintf(server_obstacle_str, "%d", server_obstacle[0]);
 
@@ -267,7 +284,7 @@ int main(int argc, char *argv[]) {
             //  processes
             if (i == NUM_PROCESSES - 1) {
                 for (int i = 0; i < NUM_PROCESSES - 1; i++)
-                    sprintf(child_pids_str[i], "%d", child[i]);
+                    sprintf(child_pids_str[i], "%d", child_pids[i]);
 
                 // Sending as arguments to the WD all the processes PIDs
                 char *exec_args[] = {process_names[i],  child_pids_str[0],
@@ -277,8 +294,8 @@ int main(int argc, char *argv[]) {
                 spawn(exec_args);
             }
         } else {
-            // If we are in the father we need to close all the unused pipes
-            // since they are duplicated every time
+            // **Parent Process: Close unused pipes**
+            // Since pipes are duplicated for each fork, close unnecessary ones
             switch (i) {
                 case 1: // **Drone has spawned**
                     Close(server_drone[0]);
@@ -318,21 +335,21 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    // Printing the pids
-    printf("Server pid is %d\n", child[0]);
-    printf("Drone pid is %d\n", child[1]);
-    printf("Konsole of Input pid is %d\n", child[2]);
-    printf("Konsole of Map pid is %d\n", child[3]);
-    printf("Target pid is %d\n", child[4]);
-    printf("Obstacle pid is %d\n", child[5]);
-    printf("Watchdog pid is %d\n", child[6]);
+    // Print PIDs of all spawned processes
+    printf("\n--- Process PIDs ---\n");
+    printf("Server     PID: %d\n", child_pids[0]);
+    printf("Drone      PID: %d\n", child_pids[1]);
+    printf("Input GUI  PID: %d (Konsole)\n", child_pids[2]);
+    printf("Map GUI    PID: %d (Konsole)\n", child_pids[3]);
+    printf("Target     PID: %d\n", child_pids[4]);
+    printf("Obstacle   PID: %d\n", child_pids[5]);
+    printf("Watchdog   PID: %d\n", child_pids[6]);
+    printf("---------------------\n\n");
 
     // Value for waiting for the children to terminate
     int exit_status;
 
-    // Wait for all direct children to terminate. Map and the konsole on which
-    // it runs on are not direct childs of the master process but of the server
-    // one so they will not return here
+    // Retrieve and display the exit status of the terminated process
     for (int i = 0; i < NUM_PROCESSES; i++) {
         int ret = Wait(&exit_status);
         // Getting the exit status
