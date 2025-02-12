@@ -20,7 +20,10 @@
 // Maximum combined force from the obstacles
 #define MAX_OBST_FORCES 1000
 // Maximum combined force from the targets
-#define MAX_TARG_FORCES 1000
+#define MAX_TARG_FORCES 2000
+
+#define INIT_POSE_X 200
+#define INIT_POSE_Y 200
 
 #define OBSTACLES_SPAWN_PERIOD 20
 
