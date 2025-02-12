@@ -60,7 +60,7 @@ float get_param(const char *process, const char *param) {
 }
 
 // Function to write log messages in the logfile
-void logging(char *type, char *message) {
+void logging(const char *type, const char *message) {
     FILE *F;
     F = Fopen(LOGFILE_PATH, "a");
     // Locking the logfile
@@ -91,7 +91,7 @@ void tokenization(struct pos *arr_to_fill, char *to_tokenize,
     int index_of;
     char *char_pointer;
     char *aux_ptr;
-    char *token;
+    const char *token;
 
     // Take the index of the first character ']' appearing in the string
     // to_tokenize

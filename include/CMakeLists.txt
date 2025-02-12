@@ -7,8 +7,13 @@ message(STATUS "cJSON library found at: ${CJSON_LIB}")
 
 # Setting macros for files
 set(WRAP_FUNC_FILES
+    wrappers/wrappers.hpp
+    wrappers/wrappers.cpp)
+
+set(WRAP_FUNC_FILES
     wrappers/wrappers.h
     wrappers/wrappers.c)
+
 
 set(UTILS_FILES
     utility/utility.h

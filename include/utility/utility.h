@@ -8,7 +8,7 @@
 #include <signal.h>
 
 float get_param(const char *process, const char *param);
-void logging(char *type, char *message);
+void logging(const char *type, const char *message);
 int max_of_many(int count, ...);
 void tokenization(struct pos *arr_to_fill, char *to_tokenize, int *objects_num);
 void remove_target(int index, struct pos *objects_arr, int objects_num);
