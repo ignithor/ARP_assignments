@@ -187,13 +187,14 @@ int main(int argc, char *argv[]) {
                             // If "T" is received, new targets have been generated  
                             logging("INFO", "Processing new target data...");
                             tokenization(targets_arr, received, &targets_num);
-                            sprintf(server_message, "Total targets updated: %d", targets_num);
-                            logging("INFO", "End new taget data");
+                            sprintf(server_message, "Total targets updated: %d",
+                                    targets_num);
+                            logging("INFO", "End new target data");
                         }
                         break;
 
-                    case 'O':  
-                        // If "O" is received, new obstacles have been generated  
+                    case 'O':
+                        // If "O" is received, new obstacles have been generated
                         logging("INFO", "Processing new obstacle data...");
                         tokenization(obstacles_arr, received, &obstacles_num);
                         logging("INFO", "End new obstacle data...");
