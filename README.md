@@ -95,5 +95,21 @@ They are all launch by the master process
 The server manages a blackboard with the geometrical state of the world (map, drone, targets, obstacles…). The server read from the pipes coming from the processes and send to the data to another process. Moreover, it also "fork" the **map** process.
 
 #### Map
+
 The **map** process display using ncurses the drone, targets and obstacles. All the data are coming through the pipe from the server. This process also compute the score of the user.
 
+#### Drone
+
+The code processes incoming messages to update obstacle data or drone force components, then calculates and resets the total repulsive forces from obstacles. It iterates through each obstacle to compute the repulsive force based on the distance from the drone, applying the force if within a specified range.
+
+#### Input
+
+The update_force function adjusts the x and y components of a force vector based on user input, clamping the values within specified maximum limits. It handles various directional inputs, including diagonal movements and stopping, and returns a boolean indicating whether the input was valid.
+
+#### Watchdog
+
+
+
+#### Target
+
+#### Obstacle
