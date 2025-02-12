@@ -1,5 +1,3 @@
-git checkout assignment2
-
 # Delete old build file if it exists
 if [ -d "build" ]; then
   rm -r build
