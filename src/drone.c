@@ -185,24 +185,18 @@ int main(int argc, char *argv[]) {
                             }
                         } else {
                             // If "T" is received, new targets have been generated  
-                            
-                            // logging("INFO", "vvvvvvvvDRONE-TARGvvvvvvv");
                             logging("INFO", "Processing new target data...");
                             tokenization(targets_arr, received, &targets_num);
                             sprintf(server_message, "Total targets updated: %d", targets_num);
-                            // logging("INFO", server_message);
-                            logging("INFO", "^^^^^^^^DRONE-TARG^^^^^^^");
+                            logging("INFO", "End new taget data");
                         }
                         break;
 
                     case 'O':  
                         // If "O" is received, new obstacles have been generated  
-                        // tokenization(obstacles_arr, received, &obstacles_num);
-                        // sprintf(server_message, "Total obstacles updated: %d", obstacles_num);
-                        // logging("INFO", server_message);
-                        logging("INFO", "vvvvvvvvDRONE-OBSTvvvvvvv");
+                        logging("INFO", "Processing new obstacle data...");
                         tokenization(obstacles_arr, received, &obstacles_num);
-                        logging("INFO", "^^^^^^^^DRONE-OBST^^^^^^^");
+                        logging("INFO", "End new obstacle data...");
                         break;
 
                     default:  
