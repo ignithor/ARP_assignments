@@ -93,14 +93,16 @@ int main() {
         message.target_y[i] = random() % SIMULATION_HEIGHT;
     }
     // Avoid seeing nothing at the beginning
-    while (difftime(time(NULL), timestamp) < 5) {
-        publisher.publish(message);
-        sleep(100);
-    }
+    if (!PUBLISHERS_SLEEP_MODE) {
+        while (difftime(time(NULL), timestamp) < 5) {
+            publisher.publish(message);
+            sleep(100);
+        }}
 
     while (true) {
-        if (!PUBLISHERS_SLEEP_MODE){
-            if (difftime(time(NULL), timestamp) > OBSTACLES_SPAWN_PERIOD*5) {
+        if (!PUBLISHERS_SLEEP_MODE) {
+            if (difftime(time(NULL), timestamp) >
+                OBSTACLES_SPAWN_PERIOD * 5) {
                 timestamp = time(NULL);
                 for (int i = 0; i < N_TARGETS; i++) {
                     message.target_x[i] = random() % SIMULATION_WIDTH;
@@ -114,5 +116,5 @@ int main() {
         }
     }
 
-    return 0;
-}
+        return 0;
+    }
