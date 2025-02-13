@@ -92,6 +92,12 @@ int main() {
         message.target_x[i] = random() % SIMULATION_WIDTH;
         message.target_y[i] = random() % SIMULATION_HEIGHT;
     }
+    // Avoid seeing nothing at the beginning
+    while (difftime(time(NULL), timestamp) < 5) {
+        publisher.publish(message);
+        sleep(100);
+    }
+
     while (true) {
         if (!PUBLISHERS_SLEEP_MODE){
             if (difftime(time(NULL), timestamp) > OBSTACLES_SPAWN_PERIOD*5) {
@@ -102,9 +108,9 @@ int main() {
                 }
                 logging("INFO",
                         "Target process generated a new set of targets");
+                publisher.publish(message);
             }
-            publisher.publish(message);
-            sleep(500);
+            sleep(1000);
         }
     }
 
