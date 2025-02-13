@@ -3,7 +3,9 @@
 # Authors
 
 Yui MOMIYAMA
+
 Paul PHAM DANG
+
 Group 3
 
 ## How to run
@@ -13,10 +15,13 @@ Group 3
 These dependencies are needed:
 
 - make
-- CMake version > 3.6
+- CMake version > 3.10
 - libncurses
-    sudo apt install libncurses5-dev libncursesw5-dev
+
+    sudo apt install libncurses5-dev
+
 - lib cjson
+
     sudo apt install libcjson-dev
 
 The assignment has been tried using Ubuntu 22.04
@@ -33,13 +38,20 @@ For assignment 2 :
 
     ./run_assignment2.sh
 
-To change from assignment 1 and 2, you can do 
-    git checkout assignment
+To change from assignment 1 and 2, you can do
+
+    git checkout <assignment>
+
+There are two branches :
+main is assignment 1 and assignment2 is for assignment 2.
+If you use the script it will automatically change to the right branch
 
 ## Rules of the game
+
 The score is updated based on the following conditions.
 
 ### Score Increment Rules
+
 - **If \( t <= 30 \):**
   - If the target number is 1:  
     `score_increment = 4 + (30 - t)`
@@ -52,6 +64,7 @@ The score is updated based on the following conditions.
     `score_increment = 2`
 
 ### Penalty Rules
+
 - **If the player hits a wall:**  
   The score is decreased by 1:  
   `score_decrement = 1`
@@ -67,6 +80,7 @@ Summary table of the scoring rules is shown below.
 | Hit a wall       | -             | -1              |
 
 This ensures that:
+
 - Hitting a new target quickly rewards the player more when the target number is 1.
 - All other target hits follow a fixed increment.
 - Hitting a wall results in a penalty, reducing the score by 1.
@@ -78,6 +92,7 @@ This ensures that:
 ![plot](./docs/architecture.jpg)
 
 ### Active components
+
 The active components of this project are:
 
 - Server
@@ -92,7 +107,7 @@ They are all launch by the master process
 
 #### Server
 
-The server manages a blackboard with the geometrical state of the world (map, drone, targets, obstacles…). The server read from the pipes coming from the processes and send to the data to another process. Moreover, it also "fork" the **map** process.
+The server manages a blackboard with the geometrical state of the world (map, drone, targets, obstacles…). The server read from the pipes coming from the processes and send to the data to other processes. Moreover, it also "fork" the **map** process. Data from pipes can be identified by a capital letter at the beginning of the message. For example, a message starting with "TH" means that a Target has been hit and the following is the coordinate of this target.
 
 #### Map
 
@@ -103,7 +118,7 @@ In the map window, the updated score and messages regarding the scoring rule are
 
 #### Drone
 
-The code processes incoming messages to update obstacle data or drone force components, then calculates and resets the total repulsive forces from obstacles. It iterates through each obstacle to compute the repulsive force based on the distance from the drone, applying the force if within a specified range.
+The code processes incoming messages to update obstacle data or drone force components, then calculates and resets the total repulsive forces from obstacles and from the walls. It iterates through each obstacle to compute the repulsive force based on the distance from the drone, applying the force if within a specified range.
 
 #### Input
 
@@ -131,19 +146,23 @@ Please note the following points:
 - Use an English keyboard to control the drone.
 
 #### Watchdog
-The code sets up a signal handler for `SIGUSR2` to increment `response_count` when the signal is received. In the `main` function, it initializes the signal handler, verifies the correct number of command-line arguments, and parses PIDs for various processes, storing them in appropriate variables.
+
+The Watchdog send `SIGUSR1` to all the processes to check if they responds. The code sets up a signal handler for`SIGUSR2` to increment `response_count` when the signal is received. In the `main` function, it initializes the signal handler, verifies the correct number of command-line arguments, and parses PIDs for various processes, storing them in appropriate variables. If we don't receive the signal from a process, we send a signal to kill all the processes.
 
 #### Target
+
 The code initializes a target generation process, validates input arguments, and communicates with a server by sending randomly generated target positions. It continuously generates and sends target data until a "STOP" signal is received, then performs cleanup and exits.
 
-
 #### Obstacle
+
 The code initializes a process to generate and send random obstacle positions to a server, using pipes for communication. It continuously generates obstacle data, sends it to the server, and handles server responses until a "STOP" signal is received, then performs cleanup and exits.
 
 #### Master
+
 The code initializes the master process, creates a log file, and logs the start of the process. It defines an array to store the names of processes to be spawned and includes a function to execute commands for spawning new processes.
 
 ### Other files
+
 The other main files of this project are:
 
 - wrappers
