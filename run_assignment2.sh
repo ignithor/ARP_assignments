@@ -1,3 +1,5 @@
+git checkout assignment2
+
 # Delete old build file if it exists
 if [ -d "build" ]; then
   rm -r build
@@ -6,7 +8,6 @@ fi
 if [ -d "bin" ]; then
   rm -r bin
 fi
-
 
 # Create a new build folder and go into it
 mkdir build
