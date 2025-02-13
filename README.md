@@ -112,7 +112,6 @@ However, these roles are interchangeable, allowing the operator on Computer 2 to
 
 In order to use fastDDS, we use C++ for some files of this assignment. So the files target, obstacle and server are now written in C++. Moreover, the libraries wrappers and utility had to be changed.
 
-
 #### target
 
 The target.cpp file defines a `TargetPublisher` class to manage the publishing of Target messages using the Fast DDS library. During the 5 first seconds the process publish the initial targets. Then, after OBSTACLES_SPAWN_PERIOD * 5 , it changes the targets' position and publish the new coordinates.
@@ -135,10 +134,10 @@ The Target.idl file defines a `Target` structure with two arrays, `target_x` and
 
 The Obstacle.idl file defines a `Obstacle` structure with two arrays, `obstacle_x` and `obstacle_y`, each containing 9 double values. This structure specifies the data format for target coordinates in a DDS system.
 
-
-#### constants.h 
+#### constants.h
 
 Here we defined three new constants compared to assignment 1 :
+
 - TOPIC_NAME_TARGET
 - TOPIC_NAME_OBSTACLE
 - PUBLISHERS_SLEEP_MODE
@@ -148,3 +147,7 @@ And the constants N_OBSTACLES and N_TARGETS can't be changed easily in this assi
     fastddsgen ./Obstacle.idl -d ./Generated
 
 in the include folder.
+
+### Remark
+
+As we deleted the pipe from Server to Target and Server to Obstacle, when we press `P` the server doesn't send the message to this two processes. The process are killed by the Watchdog which is not very elegant. But as we should work with two different computers we can't use a pipe from one computer to another. But we could add an another topic to do that but it wasn't in the assignment guidelines.
