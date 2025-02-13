@@ -24,11 +24,11 @@ These dependencies are needed:
 
     sudo apt install libcjson-dev
 
-The assignment has been tried using Ubuntu 22.04
+The assignment has been tested on Ubuntu 22.04
 
 ### Run the assignments
 
-Simply execute the scripts by executing:
+Simply run the scripts by executing:
 
 For the assignment 1 :
 
@@ -40,11 +40,10 @@ For assignment 2 :
 
 To change from assignment 1 and 2, you can do
 
-    git checkout <assignment>
+    git checkout <assignment2>
 
-There are two branches :
-main is assignment 1 and assignment2 is for assignment 2.
-If you use the script it will automatically change to the right branch
+There are two branches:
+`main` corresponds to assignment 1, and `assignment2` corresponds to assignment 2. If you use the script, it will automatically switch to the correct branch.
 
 ## Rules of the game
 
@@ -125,24 +124,24 @@ The active components of this project are:
 - Target
 - Obstacle
 
-They are all launch by the master process
+They are all launched by the master process.
 
 For the first assignment, all the files are written in C. And we compile using cmake with `CMakeLists.txt` files
 
 #### Server
 
-The server manages a blackboard with the geometrical state of the world (map, drone, targets, obstacles…). The server read from the pipes coming from the processes and send to the data to other processes. Moreover, it also "fork" the **map** process. Data from pipes can be identified by a capital letter at the beginning of the message. For example, a message starting with "TH" means that a Target has been hit and the following is the coordinate of this target.
+The server manages a blackboard with the geometrical state of the world (map, drone, targets, obstacles…). The server reads from the pipes coming from the processes and sends the data to other processes. Moreover, it also "fork" the **map** process. Data from pipes can be identified by a capital letter at the beginning of the message. For example, a message starting with "TH" means that a Target has been hit and the following is the coordinate of this target.
 
 #### Map
 
-The **map** process display using ncurses the drone, targets and obstacles. All the data are coming through the pipe from the server. This process also compute the score of the user.
+The **map** process display the drone, targets, and obstacles using ncurses. All the data are coming through the pipe from the server. This process also computes the user's score.
+
 
 In the map window, the updated score and messages regarding the scoring rule are shown at the top right.
 
 #### Drone
 
-The code processes incoming messages to update obstacle data, target and drone force components, then calculates the total force from the repulsive forces from obstacles and from the walls, the attractive force from the targets and the user input force. The external forces activate only if they are close to the object. We used the
-Latombe / Kathib’s model for the external forces using a lot of dynamic parameters defined in the `drone_parameters.json` file.
+The code processes incoming messages to update obstacle data, target data, and drone force components, then calculates the total force from the repulsive forces from obstacles and from the walls, the attractive force from the targets and the user input force. TExternal forces are activated only if they are close to the object. We used the Latombe / Kathib’s model for the external forces using a lot of dynamic parameters defined in the `drone_parameters.json` file.
 
 #### Input
 
@@ -150,7 +149,8 @@ The input module receives user commands from the keyboard and determines the for
 
 #### Watchdog
 
-The Watchdog send `SIGUSR1` to all the processes to check if they responds. All the other processes have a signal handler which send `SIGUSR2` to the Watchdog when they receive `SIGUSR1`. The code sets up a signal handler for`SIGUSR2` to increment `response_count` when the signal is received. In the `main` function, it initializes the signal handler, verifies the correct number of command-line arguments, and parses PIDs for various processes, storing them in appropriate variables. If we don't receive the signal from a process, we send a signal to kill all the processes.
+The Watchdog sends `SIGUSR1` to all the processes to check if they respond. All other processes have a signal handler that sends `SIGUSR2` to the Watchdog when they receive `SIGUSR1`. The code sets up a signal handler for`SIGUSR2` to increment `response_count` when the signal is received. In the `main` function, it initializes the signal handler, verifies the correct number of command-line arguments, and parses PIDs for various processes, storing them in appropriate variables. If we do not receive a signal from a process, we send a signal to terminate all processes.
+
 
 #### Target
 
@@ -176,7 +176,7 @@ The other main files of this project are:
 
 #### wrappers
 
-The `wrappers.c` file provides custom wrapper functions for system calls, enhancing them with detailed error handling and logging. These functions ensure robust error reporting and graceful program termination in case of failures. In all of the functions, if an error occurs, the message is added to the log file. The function name are the same as the classical system call function but with an initial capital letter.
+The `wrappers.c` file provides custom wrapper functions for system calls, enhancing them with detailed error handling and logging. These functions ensure robust error reporting and graceful program termination in case of failures. In all of the functions, if an error occurs, the message is added to the log file. The function names are the same as the classical system call functions but with an initial capital letter.
 
 #### utility
 
@@ -194,6 +194,45 @@ The `droneDataStructs.h` file defines key data structures of force, pos, and vel
 
 The `drone_parameters.json` file provides configuration settings for the drone simulation, including parameters for the drone's physical properties and input controls. It allows for easy adjustment and tuning of simulation behavior through a structured JSON format DURING THE SIMULATION. So we don't have to recompile to change a parameter unlike the constants in `constant.h`.
 
+### List of components, directories and files
+The project has the following structure:
+
+
+```bash
+.
+├── bin
+├── build
+├── CMakeLists.txt           // Main Cmake file
+├── config
+│   └── drone_parameters.json
+├── include
+│   ├── cJSON
+│   │   └── cJSON.h
+│   ├── CMakeLists.txt
+│   ├── constants.h
+│   ├── droneDataStructs.h
+│   ├── utility
+│   │   ├── utility.c
+│   │   └── utility.h
+│   └── wrappers    
+│       ├── wrappers.c
+│       └── wrappers.h
+├── log
+│   └── process.log           // Log file
+├── README.md
+├── run_assignment1.sh        // Script to run the project
+└── src                       // Include all active components
+    ├── CMakeLists.txt
+    ├── drone.c           
+    ├── input.c
+    ├── map.c
+    ├── master.c
+    ├── obstacle.c
+    ├── server.c
+    ├── target.c
+    └── watchdog.c
+```
+
 ### Remark
 
-It can happen that there is an error with a broken pipe if you close badly the project... It it happens, restart your computer and it will solve the issue :)
+A broken pipe error may occur if the project is improperly closed. If this happens, restart your computer to resolve the issue :)
