@@ -127,7 +127,7 @@ The active components of this project are:
 
 They are all launch by the master process
 
-For the first assignment, all the files are written in C.
+For the first assignment, all the files are written in C. And we compile using cmake with `CMakeLists.txt` files
 
 #### Server
 
@@ -158,11 +158,11 @@ The code initializes a target generation process, validates input arguments, and
 
 #### Obstacle
 
-The code initializes a process to generate and send random obstacle positions to a server, using pipes for communication. It continuously generates obstacle data, sends it to the server, and handles server responses until a "STOP" signal is received, then performs cleanup and exits.
+The code initializes an obstacle generation process and send random obstacle positions to the server, using pipes for communication. It continuously generates obstacle data every `OBSTACLES_SPAWN_PERIOD`, sends it to the server, and handles server responses until a "STOP" signal is received, then performs cleanup and exits.
 
 #### Master
 
-The code initializes the master process, creates a log file, creates all the pipes, execute all the processes and closed useless pipes for each process. It's the father of all the other processes.
+The code initializes the master process, creates a log file, creates all the pipes, execute all the processes and closed useless pipes for each process. It's the father of all the other processes. It's the executable we will execute to run the whole simulation.
 
 ### Other files
 
