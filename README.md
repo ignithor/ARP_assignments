@@ -40,12 +40,12 @@ To change from assignment 1 and 2, you can do
 The score is updated based on the following conditions.
 
 ### Score Increment Rules
-- **If \( t <= 20 \):**
+- **If \( t <= 30 \):**
   - If the target number is 1:  
-    `score_increment = 4 + (20 - t)`
+    `score_increment = 4 + (30 - t)`
   - If the target number is not 1:  
     `score_increment = 2`
-- **If \( t > 20 \):**
+- **If \( t > 30 \):**
   - If the target number is 1:  
     `score_increment = 4`
   - If the target number is not 1:  
@@ -60,10 +60,10 @@ Summary table of the scoring rules is shown below.
 
 | Condition        | Target Number | Score Change         |
 |------------------|---------------|----------------------|
-|  t < 20      | 1             | 4 + (20 - t)   |
-|  t < 20      | Not 1         | +2       |
-|  t >= 20  | 1             | +4              |
-|  t >= 20  | Not 1         | +2              |
+|  t < 30      | 1             | 4 + (30 - t)   |
+|  t < 30      | Not 1         | +2       |
+|  t >= 30  | 1             | +4              |
+|  t >= 30  | Not 1         | +2              |
 | Hit a wall       | -             | -1              |
 
 This ensures that:
@@ -107,9 +107,38 @@ The code processes incoming messages to update obstacle data or drone force comp
 The update_force function adjusts the x and y components of a force vector based on user input, clamping the values within specified maximum limits. It handles various directional inputs, including diagonal movements and stopping, and returns a boolean indicating whether the input was valid.
 
 #### Watchdog
-
-
+The code sets up a signal handler for `SIGUSR2` to increment `response_count` when the signal is received. In the `main` function, it initializes the signal handler, verifies the correct number of command-line arguments, and parses PIDs for various processes, storing them in appropriate variables.
 
 #### Target
+The code initializes a target generation process, validates input arguments, and communicates with a server by sending randomly generated target positions. It continuously generates and sends target data until a "STOP" signal is received, then performs cleanup and exits.
+
 
 #### Obstacle
+The code initializes a process to generate and send random obstacle positions to a server, using pipes for communication. It continuously generates obstacle data, sends it to the server, and handles server responses until a "STOP" signal is received, then performs cleanup and exits.
+
+#### Master
+The code initializes the master process, creates a log file, and logs the start of the process. It defines an array to store the names of processes to be spawned and includes a function to execute commands for spawning new processes.
+
+### Other files
+The other main files of this project are:
+
+- wrappers
+- utility
+- constant
+- droneDataStructs
+- drone_parameters.json
+
+#### wrappers
+The wrappers.c file provides custom wrapper functions for system calls, enhancing them with detailed error handling and logging. These functions ensure robust error reporting and graceful program termination in case of failures.
+
+#### utility
+The utility.c file provides various utility functions, such as reading configuration parameters from a JSON file and tokenizing strings. These functions support the main program by handling common tasks and simplifying code reuse.
+
+#### constant
+The constants.h file defines essential constants and macros used throughout the project, such as file paths, simulation dimensions, and limits for various parameters. It centralizes configuration values, ensuring consistency and ease of maintenance across the codebase.
+
+#### droneDataStructs
+The droneDataStructs.h file defines key data structures of  force, pos, and velocity, used to represent the drone's physical properties. These structures facilitate the organization and manipulation of the drone's state within the simulation.
+
+#### drone_parameters.json
+The drone_parameters.json file provides configuration settings for the drone simulation, including parameters for the drone's physical properties and input controls. It allows for easy adjustment and tuning of simulation behavior through a structured JSON format.
