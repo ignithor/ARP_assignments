@@ -14,6 +14,8 @@
 #define MAX_STR_LEN 300
 #define MAX_MSG_LEN 1024
 
+// Don't change these values without
+// changing the corresponding values in the idl files
 #define N_TARGETS 9
 #define N_OBSTACLES 10
 

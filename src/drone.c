@@ -193,8 +193,6 @@ int main(int argc, char *argv[]) {
                         } else {
                             // If "T" is received, new targets have been
                             // generated
-
-                            // logging("INFO", "vvvvvvvvDRONE-TARGvvvvvvv");
                             logging("INFO", "Processing new target data...");
                             tokenization(targets_arr, received, &targets_num);
                             sprintf(server_message, "Total targets updated: %d",
