@@ -1,7 +1,7 @@
 #ifndef WRAPPERS_H
 #define WRAPPERS_H
 #include "constants.h"
-#include "utility/utility.h"
+#include "utility/utility.hpp"
 #include <curses.h>
 #include <errno.h>
 #include <signal.h>

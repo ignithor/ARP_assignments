@@ -1,4 +1,4 @@
-#include "wrappers/wrappers.h"  
+#include "wrappers/wrappers.hpp"  
 #include <cstdio>               
 #include <cstdlib>             
 #include <cstring>              
@@ -18,7 +18,7 @@
 #include <thread>           
 #include <chrono>              
 #include <vector>               
-#include "utility/utility.h"
+#include "utility/utility.hpp"
 
 int Wait(int *wstatus) {
     int ret = wait(wstatus);
