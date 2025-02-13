@@ -15,7 +15,7 @@
 #define MAX_MSG_LEN 1024
 
 #define N_TARGETS 9
-#define N_OBSTACLES 20
+#define N_OBSTACLES 10
 
 // Maximum combined force from the obstacles
 #define MAX_OBST_FORCES 1000

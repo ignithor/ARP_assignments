@@ -1,3 +1,4 @@
+#include "Generated/ObstaclePubSubTypes.hpp"
 #include "Generated/TargetPubSubTypes.hpp"
 #include "constants.h"
 #include "droneDataStructs.h"
@@ -10,7 +11,6 @@
 #include <fastdds/dds/subscriber/Subscriber.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
 #include <iostream>
-#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -19,6 +19,11 @@ using namespace eprosima::fastdds::dds;
 struct TargetMessage {
     double target_x[N_TARGETS];
     double target_y[N_TARGETS];
+};
+
+struct ObstacleMessage {
+    double obstacle_x[N_OBSTACLES];
+    double obstacle_y[N_OBSTACLES];
 };
 
 class TargetSubscriber {
@@ -86,7 +91,7 @@ class TargetSubscriber {
                 if (info.valid_data) {
                     // Process the received target message
                     logging("INFO", (char *)"Received new target data");
-                    char msg_to_send[MAX_MSG_LEN] = "T["; // Message to send targets
+                    char msg_to_send[MAX_MSG_LEN] = "T"; // Message to send targets
                     char aux_to_send[MAX_MSG_LEN] = {0};
                     sprintf(aux_to_send, "[%d]", N_TARGETS);
                     strcat(msg_to_send, aux_to_send);
@@ -101,6 +106,104 @@ class TargetSubscriber {
                         strcat(msg_to_send, aux_to_send);
                     }
                     // Write the message to the pipes
+                    Write(to_map_pipe_, msg_to_send, MAX_MSG_LEN);
+                    Write(to_drone_pipe_, msg_to_send, MAX_MSG_LEN);
+                }
+            }
+        }
+
+      private:
+        int to_drone_pipe_; // Store pipe file descriptors
+        int to_map_pipe_;
+    } listener_;
+
+    DomainParticipant *participant_;
+    Subscriber *subscriber_;
+    Topic *topic_;
+    DataReader *reader_;
+    TypeSupport type_;
+};
+
+class ObstacleSubscriber {
+  public:
+    ObstacleSubscriber(int to_drone_pipe, int to_map_pipe)
+        : participant_(nullptr), subscriber_(nullptr), topic_(nullptr),
+          reader_(nullptr), listener_(to_drone_pipe, to_map_pipe),
+          type_(new ObstaclePubSubType()) {} // Match declaration order
+
+    bool init() {
+        DomainParticipantQos pqos;
+        participant_ =
+            DomainParticipantFactory::get_instance()->create_participant(0,
+                                                                         pqos);
+        if (!participant_)
+            return false;
+
+        type_.register_type(participant_);
+
+        SubscriberQos sub_qos;
+        subscriber_ = participant_->create_subscriber(sub_qos, nullptr);
+        if (!subscriber_)
+            return false;
+
+        TopicQos tqos;
+        topic_ = participant_->create_topic(TOPIC_NAME_OBSTACLE,
+                                            type_.get_type_name(), tqos);
+        if (!topic_)
+            return false;
+
+        DataReaderQos rqos;
+        reader_ = subscriber_->create_datareader(topic_, rqos, &listener_);
+        return reader_ != nullptr;
+    }
+
+    void run() {
+        while (true) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+    }
+
+    ~ObstacleSubscriber() {
+        if (reader_)
+            subscriber_->delete_datareader(reader_);
+        if (topic_)
+            participant_->delete_topic(topic_);
+        if (subscriber_)
+            participant_->delete_subscriber(subscriber_);
+        if (participant_)
+            DomainParticipantFactory::get_instance()->delete_participant(
+                participant_);
+    }
+
+  private:
+    class SubListener : public DataReaderListener {
+      public:
+        SubListener(int to_drone_pipe, int to_map_pipe)
+            : to_drone_pipe_(to_drone_pipe), to_map_pipe_(to_map_pipe) {}
+
+        void on_data_available(DataReader *reader) override {
+            SampleInfo info;
+            ObstacleMessage obstacle;
+            if (reader->take_next_sample(&obstacle, &info) ==
+                eprosima::fastdds::dds::RETCODE_OK) {
+                if (info.valid_data) {
+                    // Process the received obstacle message
+                    logging("INFO", (char *)"Received new obstacle data");
+                    char msg_to_send[MAX_MSG_LEN] = "O";
+                    char aux_to_send[MAX_MSG_LEN] = {0};
+                    sprintf(aux_to_send, "[%d]", N_OBSTACLES);
+                    strcat(msg_to_send, aux_to_send);
+                    for (int i = 0; i < N_OBSTACLES; i++) {
+                        if (i != 0)
+                            strcat(msg_to_send,
+                                   "|"); // Separate obstacles with "|"
+                        // Append formatted obstacle coordinates to message
+                        sprintf(aux_to_send, "%.3f,%.3f",
+                                obstacle.obstacle_x[i], obstacle.obstacle_y[i]);
+                        strcat(msg_to_send, aux_to_send);
+                    }
+                    // Write the message to the pipes
+                    logging("INFO", msg_to_send);
                     Write(to_map_pipe_, msg_to_send, MAX_MSG_LEN);
                     Write(to_drone_pipe_, msg_to_send, MAX_MSG_LEN);
                 }
@@ -145,14 +248,22 @@ int main(int argc, char *argv[]) {
     }
 
     // Initialize the TargetSubscriber with pipe file descriptors
-    TargetSubscriber subscriber(to_drone_pipe, to_map_pipe);
-    if (!subscriber.init()) {
+    TargetSubscriber subscriber_target(to_drone_pipe, to_map_pipe);
+    if (!subscriber_target.init()) {
+        std::cerr << "Failed to initialize Fast DDS subscriber" << std::endl;
+        return 1;
+    }
+
+    // Initialize the ObstacleSubscriber with pipe file descriptors
+    ObstacleSubscriber subscriber_obstacle(to_drone_pipe, to_map_pipe);
+    if (!subscriber_obstacle.init()) {
         std::cerr << "Failed to initialize Fast DDS subscriber" << std::endl;
         return 1;
     }
 
     // Run the subscriber in a separate thread
-    std::thread subscriber_thread(&TargetSubscriber::run, &subscriber);
+    std::thread subscriber_target_thread(&TargetSubscriber::run, &subscriber_target);
+    std::thread subscriber_obstacle_thread(&ObstacleSubscriber::run, &subscriber_obstacle);
 
     // Structs for each drone information
     struct pos drone_current_pos           = {0, 0}; // Initialize all fields
@@ -272,7 +383,8 @@ int main(int argc, char *argv[]) {
     Close(to_input_pipe);
 
     // Wait for the subscriber thread to finish
-    subscriber_thread.join();
+    subscriber_target_thread.join();
+    subscriber_obstacle_thread.join();
 
     return EXIT_SUCCESS;
 }
