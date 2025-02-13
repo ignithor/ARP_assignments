@@ -15,8 +15,8 @@
 using namespace eprosima::fastdds::dds;
 
 struct ObstacleMessage {
-    double obstacle_x[N_TARGETS];
-    double obstacle_y[N_TARGETS];
+    double obstacle_x[N_OBSTACLES];
+    double obstacle_y[N_OBSTACLES];
 };
 
 class ObstaclePublisher {
@@ -84,7 +84,14 @@ int main() {
     }
 
     // Seeding the random number generator
-    srandom((unsigned int)time(NULL));
+    srandom((unsigned int)time(NULL)*6416);
+    ObstacleMessage message;
+    for (int i = 0; i < N_OBSTACLES; i++) {
+        message.obstacle_x[i] = random() % SIMULATION_WIDTH;
+        message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
+    }
+    time_t timestamp = time(NULL);
+
     ObstacleMessage message;
     for (int i = 0; i < N_OBSTACLES; i++) {
         message.obstacle_x[i] = random() % SIMULATION_WIDTH;
@@ -95,6 +102,14 @@ int main() {
 
     while (true) {
         if (!PUBLISHERS_SLEEP_MODE) {
+            if (difftime(time(NULL), timestamp) > OBSTACLES_SPAWN_PERIOD) {
+                timestamp = time(NULL);
+                for (int i = 0; i < N_OBSTACLES; i++) {
+                    message.obstacle_x[i] = random() % SIMULATION_WIDTH;
+                    message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
+                }
+                logging("INFO",
+                        "Obstacle process generated a new set of obstacles");
             if (difftime(time(NULL), timestamp) > OBSTACLES_SPAWN_PERIOD) {
                 timestamp = time(NULL);
                 for (int i = 0; i < N_OBSTACLES; i++) {
