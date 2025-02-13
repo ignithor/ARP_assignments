@@ -98,13 +98,37 @@ The server manages a blackboard with the geometrical state of the world (map, dr
 
 The **map** process display using ncurses the drone, targets and obstacles. All the data are coming through the pipe from the server. This process also compute the score of the user.
 
+In the map window, the updated score and messages regarding the scoring rule are shown at the top right. 
+
+
 #### Drone
 
 The code processes incoming messages to update obstacle data or drone force components, then calculates and resets the total repulsive forces from obstacles. It iterates through each obstacle to compute the repulsive force based on the distance from the drone, applying the force if within a specified range.
 
 #### Input
 
-The update_force function adjusts the x and y components of a force vector based on user input, clamping the values within specified maximum limits. It handles various directional inputs, including diagonal movements and stopping, and returns a boolean indicating whether the input was valid.
+The input module receives user commands from the keyboard and determines the forces currently acting on the drone based on these inputs. These computed forces are then transmitted to the server via a pipe, making them accessible to the drone process, which utilizes them to calculate its dynamics. Additionally, the input module is responsible for displaying various drone parameters, including position, velocity, and applied forces. If the `p` key is pressed, the input module sends a `STOP` signal to ensure all processes are safely terminated.
+
+```bash
+
+Movement Keys:      Exit Key:
+-------------                 
+| Q | W | E |                  
+-------------         ---    
+| A | S | D |   ---> | P |   
+-------------         ---     
+| Z | X | C |                  
+-------------  
+
+```
+
+
+The eight external keys allow the user to control the drone by applying force in the corresponding direction (up, up-right, right, etc.). Meanwhile, pressing the `s` key immediately nullifies all forces. The spacebar functions identically to the 'S' key. Finally, pressing the 'P' key ensures a safe shutdown of the program. 
+
+Please note the following points:
+
+- For these controls to work, the Input window must be selected when it appears.
+- Use an English keyboard to control the drone.
 
 #### Watchdog
 The code sets up a signal handler for `SIGUSR2` to increment `response_count` when the signal is received. In the `main` function, it initializes the signal handler, verifies the correct number of command-line arguments, and parses PIDs for various processes, storing them in appropriate variables.
@@ -129,16 +153,17 @@ The other main files of this project are:
 - drone_parameters.json
 
 #### wrappers
-The wrappers.c file provides custom wrapper functions for system calls, enhancing them with detailed error handling and logging. These functions ensure robust error reporting and graceful program termination in case of failures.
+The `wrappers.c` file provides custom wrapper functions for system calls, enhancing them with detailed error handling and logging. These functions ensure robust error reporting and graceful program termination in case of failures. In all of the functions above, if an error occurs, the message should be added to the log file.
+
 
 #### utility
-The utility.c file provides various utility functions, such as reading configuration parameters from a JSON file and tokenizing strings. These functions support the main program by handling common tasks and simplifying code reuse.
+The `utility.c` file provides various utility functions, such as reading configuration parameters from a JSON file and tokenizing strings. These functions support the main program by handling common tasks and simplifying code reuse.
 
 #### constant
-The constants.h file defines essential constants and macros used throughout the project, such as file paths, simulation dimensions, and limits for various parameters. It centralizes configuration values, ensuring consistency and ease of maintenance across the codebase.
+The `constants.h` file defines essential constants and macros used throughout the project, such as file paths, simulation dimensions, and limits for various parameters. It centralizes configuration values, ensuring consistency and ease of maintenance across the codebase.
 
 #### droneDataStructs
-The droneDataStructs.h file defines key data structures of  force, pos, and velocity, used to represent the drone's physical properties. These structures facilitate the organization and manipulation of the drone's state within the simulation.
+The `droneDataStructs.h` file defines key data structures of  force, pos, and velocity, used to represent the drone's physical properties. These structures facilitate the organization and manipulation of the drone's state within the simulation.
 
 #### drone_parameters.json
-The drone_parameters.json file provides configuration settings for the drone simulation, including parameters for the drone's physical properties and input controls. It allows for easy adjustment and tuning of simulation behavior through a structured JSON format.
+The `drone_parameters.json` file provides configuration settings for the drone simulation, including parameters for the drone's physical properties and input controls. It allows for easy adjustment and tuning of simulation behavior through a structured JSON format.
