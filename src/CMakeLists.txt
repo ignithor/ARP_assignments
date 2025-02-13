@@ -30,9 +30,17 @@ set(SOURCE_OBSTACLE_FILES
     ${CMAKE_SOURCE_DIR}/include/Generated/ObstaclePubSubTypes.cxx
 )
 
+set(SOURCE_SERVER_FILES 
+    server.cpp
+    ${CMAKE_SOURCE_DIR}/include/Generated/ObstacleTypeObjectSupport.cxx
+    ${CMAKE_SOURCE_DIR}/include/Generated/ObstaclePubSubTypes.cxx
+    ${CMAKE_SOURCE_DIR}/include/Generated/TargetTypeObjectSupport.cxx
+    ${CMAKE_SOURCE_DIR}/include/Generated/TargetPubSubTypes.cxx
+)
+
 # Adding executables with relative files
 add_executable(master master.c)
-add_executable(server server.c)
+add_executable(server ${SOURCE_SERVER_FILES})
 add_executable(drone drone.c)
 add_executable(map map.c)
 add_executable(watchdog watchdog.c)
@@ -42,7 +50,7 @@ add_executable(obstacle ${SOURCE_OBSTACLE_FILES})
 
 # Adding the required libraries for the executables
 target_link_libraries(master wrappers constants)
-target_link_libraries(server wrappers constants utility)
+target_link_libraries(server wrappers_cpp constants utility_cpp stdc++ fastcdr fastdds)
 target_link_libraries(drone wrappers constants utility m)
 target_link_libraries(map wrappers constants m utility ${CURSES_LIBRARIES})
 target_link_libraries(watchdog wrappers constants utility)

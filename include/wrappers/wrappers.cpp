@@ -138,7 +138,7 @@ int Read(int fd, void *buf, size_t nbytes) {
     return ret;
 }
 
-int Write(int fd, const void *buf, size_t nbytes) {
+int Write(int fd, void *buf, size_t nbytes) {
     // Ignore SIGPIPE to prevent process crashes
     struct sigaction ignore_pipesig;
     ignore_pipesig.sa_handler = SIG_IGN;
