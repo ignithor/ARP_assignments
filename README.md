@@ -8,6 +8,8 @@ Paul PHAM DANG
 
 Group 3
 
+[Github Link](https://github.com/ignithor/ARP_assignments/tree/main)
+
 ## How to run
 
 ### Dependencies
@@ -136,7 +138,6 @@ The server manages a blackboard with the geometrical state of the world (map, dr
 
 The **map** process display the drone, targets, and obstacles using ncurses. All the data are coming through the pipe from the server. This process also computes the user's score.
 
-
 In the map window, the updated score and messages regarding the scoring rule are shown at the top right.
 
 #### Drone
@@ -150,7 +151,6 @@ The input module receives user commands from the keyboard and determines the for
 #### Watchdog
 
 The Watchdog sends `SIGUSR1` to all the processes to check if they respond. All other processes have a signal handler that sends `SIGUSR2` to the Watchdog when they receive `SIGUSR1`. The code sets up a signal handler for`SIGUSR2` to increment `response_count` when the signal is received. In the `main` function, it initializes the signal handler, verifies the correct number of command-line arguments, and parses PIDs for various processes, storing them in appropriate variables. If we do not receive a signal from a process, we send a signal to terminate all processes.
-
 
 #### Target
 
@@ -195,8 +195,8 @@ The `droneDataStructs.h` file defines key data structures of force, pos, and vel
 The `drone_parameters.json` file provides configuration settings for the drone simulation, including parameters for the drone's physical properties and input controls. It allows for easy adjustment and tuning of simulation behavior through a structured JSON format DURING THE SIMULATION. So we don't have to recompile to change a parameter unlike the constants in `constant.h`.
 
 ### List of components, directories and files
-The project has the following structure:
 
+The project has the following structure:
 
 ```bash
 .
