@@ -11,6 +11,7 @@
 #include <fastdds/dds/publisher/Publisher.hpp>
 #include <fastdds/dds/topic/TypeSupport.hpp>
 #include <iostream>
+#include <thread>
 
 using namespace eprosima::fastdds::dds;
 
@@ -85,20 +86,27 @@ int main() {
 
     // Seeding the random number generator
     srandom((unsigned int)time(NULL));
-
+    time_t timestamp = time(NULL);
+    TargetMessage message;
+    for (int i = 0; i < N_TARGETS; i++) {
+        message.target_x[i] = random() % SIMULATION_WIDTH;
+        message.target_y[i] = random() % SIMULATION_HEIGHT;
+    }
     while (true) {
         if (!PUBLISHERS_SLEEP_MODE){
-            TargetMessage message;
-            for (int i = 0; i < N_TARGETS; i++) {
-                message.target_x[i] = random() % SIMULATION_WIDTH;
-                message.target_y[i] = random() % SIMULATION_HEIGHT;
+            if (difftime(time(NULL), timestamp) > OBSTACLES_SPAWN_PERIOD*5) {
+                timestamp = time(NULL);
+                for (int i = 0; i < N_TARGETS; i++) {
+                    message.target_x[i] = random() % SIMULATION_WIDTH;
+                    message.target_y[i] = random() % SIMULATION_HEIGHT;
+                }
+                logging("INFO",
+                        "Target process generated a new set of targets");
             }
             publisher.publish(message);
-            logging("INFO", "Target process generated a new set of targets");
-            sleep(20); // Adjust as needed to control publish rate
+            sleep(500);
         }
-        }
-
+    }
 
     return 0;
 }

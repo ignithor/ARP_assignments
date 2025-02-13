@@ -85,20 +85,28 @@ int main() {
 
     // Seeding the random number generator
     srandom((unsigned int)time(NULL));
+    ObstacleMessage message;
+    for (int i = 0; i < N_OBSTACLES; i++) {
+        message.obstacle_x[i] = random() % SIMULATION_WIDTH;
+        message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
+    }
+    time_t timestamp = time(NULL);
+
 
     while (true) {
         if (!PUBLISHERS_SLEEP_MODE) {
-
-            ObstacleMessage message;
-            for (int i = 0; i < N_TARGETS; i++) {
-                message.obstacle_x[i] = random() % SIMULATION_WIDTH;
-                message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
+            if (difftime(time(NULL), timestamp) > OBSTACLES_SPAWN_PERIOD) {
+                timestamp = time(NULL);
+                for (int i = 0; i < N_OBSTACLES; i++) {
+                    message.obstacle_x[i] = random() % SIMULATION_WIDTH;
+                    message.obstacle_y[i] = random() % SIMULATION_HEIGHT;
+                }
+                logging("INFO",
+                        "Obstacle process generated a new set of obstacles");
             }
             publisher.publish(message);
-            logging("INFO",
-                    "Obstacle process generated a new set of obstacles");
-            sleep(OBSTACLES_SPAWN_PERIOD); // Adjust as needed to control
-                                           // publish rate
+
+            sleep(500);
         }}
 
     return 0;
