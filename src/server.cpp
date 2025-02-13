@@ -227,20 +227,15 @@ int main(int argc, char *argv[]) {
 
     // Initialize pipes
     int from_drone_pipe, to_drone_pipe, from_input_pipe, to_input_pipe,
-        from_map_pipe, to_map_pipe, from_target_pipe, to_target_pipe,
-        from_obstacles_pipe, to_obstacle_pipe;
+        from_map_pipe, to_map_pipe;
 
-    if (argc == 11) {
+    if (argc == 7) {
         sscanf(argv[1], "%d", &from_drone_pipe);
         sscanf(argv[2], "%d", &to_drone_pipe);
         sscanf(argv[3], "%d", &from_input_pipe);
         sscanf(argv[4], "%d", &to_input_pipe);
         sscanf(argv[5], "%d", &from_map_pipe);
         sscanf(argv[6], "%d", &to_map_pipe);
-        sscanf(argv[7], "%d", &from_target_pipe);
-        sscanf(argv[8], "%d", &to_target_pipe);
-        sscanf(argv[9], "%d", &from_obstacles_pipe);
-        sscanf(argv[10], "%d", &to_obstacle_pipe);
     } else {
         printf("Server: wrong number of arguments in input\n");
         getchar();
@@ -281,14 +276,11 @@ int main(int argc, char *argv[]) {
     FD_SET(from_drone_pipe, &master);
     FD_SET(from_input_pipe, &master);
     FD_SET(from_map_pipe, &master);
-    FD_SET(from_obstacles_pipe, &master);
-    FD_SET(from_target_pipe, &master);
     FD_SET(from_map_pipe, &master);
 
     // Setting the maxfd
     int maxfd =
-        max_of_many(6, from_drone_pipe, from_input_pipe, from_map_pipe,
-                    from_obstacles_pipe, from_target_pipe, from_map_pipe);
+        max_of_many(4, from_drone_pipe, from_input_pipe, from_map_pipe, from_map_pipe);
 
     bool to_exit = false;
     while (1) {
@@ -312,10 +304,6 @@ int main(int argc, char *argv[]) {
                         if (!strcmp(received, (char *)"STOP")) {
                             Write(to_drone_pipe, (char *)"STOP", MAX_MSG_LEN);
                             Write(to_map_pipe, (char *)"STOP", MAX_MSG_LEN);
-                            Write(to_obstacle_pipe, (char *)"STOP",
-                                  MAX_MSG_LEN);
-                            Write(to_target_pipe, (char *)"STOP", MAX_MSG_LEN);
-                            to_exit = true;
                             break;
                         } else if (!strcmp(received, "U")) {
                             // Otherwise send the drone position and
@@ -347,21 +335,14 @@ int main(int argc, char *argv[]) {
                         if (!strcmp(received, (char *)"GE")) {
                             // If we have GE sent by the map then send to target
                             // so it can produce new targets
-                            Write(to_target_pipe, (char *)"GE", MAX_MSG_LEN);
+                            // No communication from the server to target
+                            // Write(to_target_pipe, (char *)"GE", MAX_MSG_LEN);
                         } else if (received[0] == 'T' && received[1] == 'H') {
                             // If TH then there has been a target hit, inform
                             // the drone in order to remove it from the targets
                             // to consider for the forces calculations
                             Write(to_drone_pipe, received, MAX_MSG_LEN);
                         }
-                    } else if (i == from_obstacles_pipe) {
-                        // When new obstacles are ready inform map and drone
-                        Write(to_map_pipe, received, MAX_MSG_LEN);
-                        Write(to_drone_pipe, received, MAX_MSG_LEN);
-                    } else if (i == from_target_pipe) {
-                        // When new targets are ready, replace the pipe data
-                        // with the data from the subscriber
-                        // (This logic is now handled by the subscriber)
                     }
                 }
             }
@@ -374,12 +355,8 @@ int main(int argc, char *argv[]) {
     Close(from_drone_pipe);
     Close(from_input_pipe);
     Close(from_map_pipe);
-    Close(from_obstacles_pipe);
-    Close(from_target_pipe);
     Close(to_drone_pipe);
     Close(to_map_pipe);
-    Close(to_obstacle_pipe);
-    Close(to_target_pipe);
     Close(to_input_pipe);
 
     // Wait for the subscriber thread to finish

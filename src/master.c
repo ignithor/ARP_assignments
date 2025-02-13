@@ -45,10 +45,6 @@ int main(int argc, char *argv[]) {
     int input_server[2];
     int map_server[2];
     int server_map[2];
-    int target_server[2];
-    int server_target[2];
-    int obstacle_server[2];
-    int server_obstacle[2];
 
     // Creating the pipes
     Pipe(server_drone);
@@ -57,10 +53,6 @@ int main(int argc, char *argv[]) {
     Pipe(input_server);
     Pipe(map_server);
     Pipe(server_map);
-    Pipe(target_server);
-    Pipe(server_target);
-    Pipe(obstacle_server);
-    Pipe(server_obstacle);
 
     // Strings to pass pipe values as arguments
     char drone_server_str[10];
@@ -69,10 +61,6 @@ int main(int argc, char *argv[]) {
     char input_server_str[10];
     char map_server_str[10];
     char server_map_str[10];
-    char target_server_str[10];
-    char server_target_str[10];
-    char obstacle_server_str[10];
-    char server_obstacle_str[10];
 
     for (int i = 0; i < NUM_PROCESSES; i++) {
         child_pids[i] = Fork();
@@ -105,22 +93,14 @@ int main(int argc, char *argv[]) {
                     sprintf(server_input_str, "%d", server_input[1]);
                     sprintf(map_server_str, "%d", map_server[0]);
                     sprintf(server_map_str, "%d", server_map[1]);
-                    sprintf(target_server_str, "%d", target_server[0]);
-                    sprintf(server_target_str, "%d", server_target[1]);
-                    sprintf(obstacle_server_str, "%d", obstacle_server[0]);
-                    sprintf(server_obstacle_str, "%d", server_obstacle[1]);
 
                     // Assign arguments for the server process
-                    exec_args[1]  = drone_server_str;
-                    exec_args[2]  = server_drone_str;
-                    exec_args[3]  = input_server_str;
-                    exec_args[4]  = server_input_str;
-                    exec_args[5]  = map_server_str;
-                    exec_args[6]  = server_map_str;
-                    exec_args[7]  = target_server_str;
-                    exec_args[8]  = server_target_str;
-                    exec_args[9]  = obstacle_server_str;
-                    exec_args[10] = server_obstacle_str;
+                    exec_args[1] = drone_server_str;
+                    exec_args[2] = server_drone_str;
+                    exec_args[3] = input_server_str;
+                    exec_args[4] = server_input_str;
+                    exec_args[5] = map_server_str;
+                    exec_args[6] = server_map_str;
 
                     // **Close unused pipe ends** to prevent resource leaks
                     Close(drone_server[1]); // Server only reads from drone
@@ -129,10 +109,6 @@ int main(int argc, char *argv[]) {
                     Close(server_input[0]);
                     Close(map_server[1]);
                     Close(server_map[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(obstacle_server[1]);
-                    Close(server_obstacle[0]);
 
                     // Spawn the server process
                     spawn(exec_args);
@@ -160,14 +136,6 @@ int main(int argc, char *argv[]) {
                     Close(map_server[1]);
                     Close(server_map[0]);
                     Close(server_map[1]);
-                    Close(target_server[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(server_target[1]);
-                    Close(obstacle_server[0]);
-                    Close(obstacle_server[1]);
-                    Close(server_obstacle[0]);
-                    Close(server_obstacle[1]);
 
                     // Spawn the drone process
                     spawn(exec_args);
@@ -192,14 +160,6 @@ int main(int argc, char *argv[]) {
                     Close(map_server[1]);
                     Close(server_map[0]);
                     Close(server_map[1]);
-                    Close(target_server[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(server_target[1]);
-                    Close(obstacle_server[0]);
-                    Close(obstacle_server[1]);
-                    Close(server_obstacle[0]);
-                    Close(server_obstacle[1]);
 
                     // Launch the input process in a new terminal window
                     Execvp("konsole", konsole_arg_list);
@@ -220,16 +180,6 @@ int main(int argc, char *argv[]) {
                     Close(map_server[0]); // Map only writes to the server
                     Close(server_map[1]); // Map only reads from the server
 
-                    // Close all unrelated pipes
-                    Close(target_server[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(server_target[1]);
-                    Close(obstacle_server[0]);
-                    Close(obstacle_server[1]);
-                    Close(server_obstacle[0]);
-                    Close(server_obstacle[1]);
-
                     // Launch the map process in a new terminal window
                     Execvp("konsole", konsole_arg_list);
                     exit(EXIT_FAILURE);
@@ -237,46 +187,12 @@ int main(int argc, char *argv[]) {
 
                 case 4:
                     // **Target Process Setup**
-                    // Convert pipe descriptors to strings for argument passing
-                    sprintf(target_server_str, "%d", target_server[1]);
-                    sprintf(server_target_str, "%d", server_target[0]);
-
-                    // Assign pipe arguments for the target process
-                    exec_args[1] = target_server_str;
-                    exec_args[2] = server_target_str;
-
-                    // **Close unused pipe ends** for the target process
-                    Close(target_server[0]); // Target only writes to the server
-                    Close(
-                        server_target[1]); // Target only reads from the server
-
-                    // Close all unrelated pipes (Obstacle-related)
-                    Close(obstacle_server[0]);
-                    Close(obstacle_server[1]);
-                    Close(server_obstacle[0]);
-                    Close(server_obstacle[1]);
-
                     // Spawn the target process
                     spawn(exec_args);
                     break;
 
                 case 5:
                     // **Obstacle Process Setup**
-                    // Convert pipe descriptors to strings for argument passing
-                    sprintf(obstacle_server_str, "%d", obstacle_server[1]);
-                    sprintf(server_obstacle_str, "%d", server_obstacle[0]);
-
-                    // Assign pipe arguments for the obstacle process
-                    exec_args[1] = obstacle_server_str;
-                    exec_args[2] = server_obstacle_str;
-
-                    // **Close unused pipe ends** for the obstacle process
-                    Close(obstacle_server[0]); // Obstacle only writes to the
-                                               // server
-                    Close(server_obstacle[1]); // Obstacle only reads from the
-                                               // server
-
-                    // Spawn the obstacle process
                     spawn(exec_args);
                     break;
             }
@@ -319,17 +235,9 @@ int main(int argc, char *argv[]) {
                     break;
 
                 case 4: // **Target has spawned**
-                    Close(target_server[0]);
-                    Close(target_server[1]);
-                    Close(server_target[0]);
-                    Close(server_target[1]);
                     break;
 
                 case 5: // **Obstacle has spawned**
-                    Close(obstacle_server[0]);
-                    Close(obstacle_server[1]);
-                    Close(server_obstacle[0]);
-                    Close(server_obstacle[1]);
                     break;
             }
         }
