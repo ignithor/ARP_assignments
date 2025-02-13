@@ -193,3 +193,7 @@ The `droneDataStructs.h` file defines key data structures of force, pos, and vel
 #### drone_parameters.json
 
 The `drone_parameters.json` file provides configuration settings for the drone simulation, including parameters for the drone's physical properties and input controls. It allows for easy adjustment and tuning of simulation behavior through a structured JSON format DURING THE SIMULATION. So we don't have to recompile to change a parameter unlike the constants in `constant.h`.
+
+### Remark
+
+It can happen that there is an error with a broken pipe if you close badly the project... It it happens, restart your computer and it will solve the issue :)
